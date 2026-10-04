@@ -1,4 +1,7 @@
 
+// Imports must precede the plugins block in a Kotlin DSL script.
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -32,7 +35,11 @@ android {
         //   keyPassword=...
         val propsFile = rootProject.file("keystore.properties")
         if (propsFile.exists()) {
-            val props = java.util.Properties().apply { propsFile.inputStream().use { load(it) } }
+            // `java.util.Properties` does not resolve inside a Kotlin DSL script:
+            // `java` there is Gradle's JavaPluginExtension, not the java package,
+            // which is why the fully qualified name fails to compile.
+            val props = Properties()
+            propsFile.inputStream().use { props.load(it) }
             create("release") {
                 storeFile = rootProject.file(props.getProperty("storeFile"))
                 storePassword = props.getProperty("storePassword")
