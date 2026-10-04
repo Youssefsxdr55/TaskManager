@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -88,10 +89,9 @@ android {
     }
 }
 
-ksp {
+room {
     // Export schemas so Room migrations can be tested (PRD 11: data integrity).
-    arg("room.schemaLocation", "$projectDir/schemas")
-    arg("room.incremental", "true")
+    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {
@@ -128,7 +128,6 @@ dependencies {
     implementation(libs.hilt.work)
     implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
-    ksp(libs.hilt.androidx.compiler)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
