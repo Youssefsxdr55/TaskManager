@@ -28,7 +28,7 @@ interface SearchableTaskDao {
         INNER JOIN tasks t ON t.id = searchable_task.rowid
         WHERE searchable_task MATCH :match
           AND t.deletedAt IS NULL
-        ORDER BY rank
+        ORDER BY searchable_task.rowid
         LIMIT :limit
         """
     )

@@ -25,17 +25,9 @@ data class PointsLedgerEntry(
     val createdAt: Long = System.currentTimeMillis()
 )
 
-@Entity(
-    tableName = "rewards",
-    foreignKeys = [
-        ForeignKey(
-            entity = Reward::class,
-            parentColumns = ["id"],
-            childColumns = ["rewardId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
+// Rewards reference nothing. The foreign key to Reward belongs on
+// RewardRedemption below, not on Reward itself.
+@Entity(tableName = "rewards")
 data class Reward(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,

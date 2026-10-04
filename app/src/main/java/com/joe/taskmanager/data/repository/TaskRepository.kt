@@ -51,7 +51,7 @@ class TaskRepository @Inject constructor(
     fun observeOverdueCount(): Flow<Int> =
         taskDao.observeOverdueCount(System.currentTimeMillis(), com.joe.taskmanager.util.DateUtils.endOfToday())
     fun observeUpcoming(): Flow<List<Task>> =
-        taskDao.observeUpcoming(System.currentTimeMillis(), com.joe.taskmanager.util.DateUtils.endOfToday())
+        taskDao.observeUpcoming(com.joe.taskmanager.util.DateUtils.endOfToday())
     fun observeAllOpen(): Flow<List<Task>> = taskDao.observeAllOpen()
     fun observeCompleted(): Flow<List<Task>> = taskDao.observeCompleted()
     fun observeTrash(): Flow<List<Task>> = taskDao.observeTrash()

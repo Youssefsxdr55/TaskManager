@@ -99,7 +99,7 @@ interface TaskDao {
         ORDER BY dueDate ASC, priority DESC, sortOrder ASC
         """
     )
-    fun observeUpcoming(now: Long, endOfToday: Long): Flow<List<Task>>
+    fun observeUpcoming(endOfToday: Long): Flow<List<Task>>
 
     // ---------- All / completed / trash ----------
 
