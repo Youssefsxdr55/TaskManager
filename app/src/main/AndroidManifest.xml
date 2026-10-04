@@ -74,11 +74,19 @@
             </intent-filter>
         </receiver>
 
+        <!--
+          WorkManager's own manifest already declares androidx.startup's
+          InitializationProvider with authorities ${applicationId}.androidx-startup,
+          while ours uses ${applicationId}.androidx.startup. The merger sees two
+          different values for the same attribute, so tools:replace is required to
+          state which one wins.
+        -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx.startup"
             android:exported="false"
-            tools:node="merge">
+            tools:node="merge"
+            tools:replace="android:authorities">
             <meta-data
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
