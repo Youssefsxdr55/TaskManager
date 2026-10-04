@@ -63,8 +63,7 @@ import com.joe.taskmanager.data.local.entity.TaskTag
         RewardRedemption::class,
         BadgeUnlock::class,
         Event::class,
-        SearchableTask::class,
-        SearchableTaskContent::class
+        SearchableTask::class
     ],
     version = 1,
     exportSchema = true

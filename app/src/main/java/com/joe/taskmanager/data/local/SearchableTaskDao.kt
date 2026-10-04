@@ -1,4 +1,3 @@
-
 package com.joe.taskmanager.data.local
 
 import androidx.room.Dao
@@ -12,8 +11,9 @@ interface SearchableTaskDao {
      * FTS4 MATCH. The expression comes from SearchQueryBuilder, which escapes user
      * input; raw user text is never interpolated unescaped into FTS syntax.
      *
-     * The JOIN back to tasks applies the same deletedAt IS NULL filter as every
-     * other query, so trashed tasks never appear in results.
+     * The JOIN back to tasks applies the same deletedAt IS NULL filter every
+     * other query uses, so trashed tasks never appear in results. bm25() is the
+     * FTS4 relevance function and is only valid on the FTS table itself.
      */
     @Query(
         """
@@ -25,10 +25,10 @@ interface SearchableTaskDao {
                t.priority AS priority,
                t.listId AS listId
         FROM searchable_task
-        INNER JOIN tasks t ON t.id = searchable_task.rowid
+        JOIN tasks t ON t.id = searchable_task.rowid
         WHERE searchable_task MATCH :match
           AND t.deletedAt IS NULL
-        ORDER BY searchable_task.rowid
+        ORDER BY bm25(searchable_task)
         LIMIT :limit
         """
     )
