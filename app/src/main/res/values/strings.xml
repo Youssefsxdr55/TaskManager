@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task Manager</string>
+
+    <!-- Navigation -->
+    <string name="nav_today">Today</string>
+    <string name="nav_upcoming">Upcoming</string>
+    <string name="nav_inbox">Inbox</string>
+    <string name="nav_all_tasks">All Tasks</string>
+    <string name="nav_completed">Completed</string>
+    <string name="nav_tags">Tags</string>
+    <string name="nav_trash">Trash</string>
+    <string name="nav_tasks">Tasks</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Actions -->
+    <string name="action_done">Done</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_add_task">Add task</string>
+    <string name="action_snooze">Snooze</string>
+    <string name="action_snooze_fmt">Snooze %1$d min</string>
+    <string name="action_snooze_later_today">Later today</string>
+    <string name="action_snooze_tomorrow">Tomorrow</string>
+    <string name="action_snooze_next_week">Next week</string>
+    <string name="action_snooze_pick">Pick date/time</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_close">Close</string>
+    <string name="action_restore">Restore</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_mark_done">Mark as done</string>
+    <string name="cd_mark_open">Mark as not done</string>
+    <string name="cd_add_task">Add a task</string>
+    <string name="cd_open_drawer">Open navigation drawer</string>
+    <string name="cd_back">Go back</string>
+    <string name="cd_search">Search</string>
+
+    <!-- Task -->
+    <string name="task_title_hint">What needs doing?</string>
+    <string name="task_title_label">Title</string>
+    <string name="task_notes_hint">Notes</string>
+    <string name="task_notes_label">Notes</string>
+    <string name="task_subtasks">Subtasks</string>
+    <string name="task_subtask_hint">Add a subtask</string>
+    <string name="chip_date">Date</string>
+    <string name="chip_priority">Priority</string>
+    <string name="chip_list">List</string>
+    <string name="chip_tags">Tags</string>
+    <string name="chip_reminder">Reminder</string>
+    <string name="priority_none">None</string>
+    <string name="priority_low">Low</string>
+    <string name="priority_medium">Medium</string>
+    <string name="priority_high">High</string>
+
+    <!-- Views -->
+    <string name="empty_today_title">Nothing due today</string>
+    <string name="empty_today_body">Tap the button below to add your first task.</string>
+    <string name="empty_upcoming_title">Nothing upcoming</string>
+    <string name="empty_all_title">No tasks</string>
+    <string name="empty_completed_title">No completed tasks</string>
+    <string name="empty_trash_title">Trash is empty</string>
+    <string name="empty_search_title">No matches</string>
+
+    <!-- Overdue (PRD OQ-1: compact red banner, tasks stay in place) -->
+    <string name="overdue_banner">Overdue (%1$d)</string>
+
+    <!-- Dates -->
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
+
+    <!-- Alarm -->
+    <string name="alarm_heading">Task reminder</string>
+    <string name="alarm_no_title">(no title)</string>
+
+    <!-- Reminders -->
+    <string name="reminder_at_due">At due time</string>
+    <string name="reminder_before">Before</string>
+    <string name="reminder_absolute">Custom time</string>
+    <string name="reminder_none">No reminder</string>
+
+    <!-- Search -->
+    <string name="search_hint">Search tasks</string>
+    <string name="search_filters">Filters</string>
+    <string name="filter_sort">Sort</string>
+    <string name="sort_due">Due date</string>
+    <string name="sort_priority">Priority</string>
+    <string name="sort_created">Creation date</string>
+    <string name="sort_manual">Manual</string>
+
+    <!-- Settings -->
+    <string name="settings_general">General</string>
+    <string name="settings_reminders">Reminders</string>
+    <string name="settings_backup">Backup</string>
+    <string name="settings_about">About</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_snooze_duration">Default snooze duration</string>
+    <string name="settings_reliability_check">Reliability check</string>
+    <string name="settings_export">Export backup</string>
+    <string name="settings_import">Import backup</string>
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Fast capture</string>
+    <string name="onboarding_welcome_body">Add a task with just a title in a few taps. Everything else is optional.</string>
+    <string name="onboarding_reminders_title">Reminders that fire</string>
+    <string name="onboarding_reminders_body">Exact alarms that survive reboot and battery saving, with a full-screen alarm for what matters.</string>
+    <string name="onboarding_privacy_title">Private by default</string>
+    <string name="onboarding_privacy_body">Everything stays on this phone. No account, no server, no tracking.</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_start">Get started</string>
+
+    <!-- Permissions -->
+    <string name="perm_notifications_title">Notifications</string>
+    <string name="perm_notifications_body">Needed so reminders can reach you.</string>
+    <string name="perm_exact_alarm_title">Exact alarms</string>
+    <string name="perm_exact_alarm_body">Needed so reminders arrive at the minute you chose.</string>
+    <string name="perm_full_screen_title">Full-screen alarms</string>
+    <string name="perm_full_screen_body">Lets high-priority tasks ring over your lock screen.</string>
+    <string name="perm_battery_title">Battery optimization</string>
+    <string name="perm_battery_body">Some phone makers stop alarms for apps they think are unused. Exempting this app keeps reminders reliable.</string>
+    <string name="perm_grant">Grant</string>
+    <string name="perm_granted">Granted</string>
+    <string name="perm_continue">Continue</string>
+
+    <!-- Backup -->
+    <string name="backup_choose_folder">Choose backup folder</string>
+    <string name="backup_complete">Backup saved</string>
+    <string name="backup_failed">Backup failed. Please pick the folder again.</string>
+    <string name="backup_import_confirm">Importing replaces all current data. Continue?</string>
+    <string name="backup_import_complete">Import complete</string>
+    <string name="backup_import_failed">Import failed</string>
+    <string name="backup_no_folder">No folder selected yet</string>
+
+    <!-- Reliability check -->
+    <string name="reliability_title">Reminder reliability</string>
+    <string name="reliability_ok">All set</string>
+    <string name="reliability_issue">Needs attention</string>
+
+    <!-- Trash -->
+    <string name="trash_retention">Tasks in trash are deleted after 30 days.</string>
+    <string name="task_deleted">Task deleted</string>
+    <string name="task_completed">Task completed</string>
+    <string name="task_postponed">Task postponed</string>
+</resources>

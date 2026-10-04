@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مدير المهام</string>
+
+    <!-- Navigation -->
+    <string name="nav_today">النهاردة</string>
+    <string name="nav_upcoming">القادمة</string>
+    <string name="nav_inbox">الصندوق</string>
+    <string name="nav_all_tasks">كل المهام</string>
+    <string name="nav_completed">المكتملة</string>
+    <string name="nav_tags">الوسوم</string>
+    <string name="nav_trash">المحذوفات</string>
+    <string name="nav_tasks">المهام</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- Actions -->
+    <string name="action_done">تم</string>
+    <string name="action_save">حفظ</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_undo">تراجع</string>
+    <string name="action_add_task">إضافة مهمة</string>
+    <string name="action_snooze">تأجيل</string>
+    <string name="action_snooze_fmt">تأجيل %1$d دقيقة</string>
+    <string name="action_snooze_later_today">بعد شوية النهاردة</string>
+    <string name="action_snooze_tomorrow">بكرة</string>
+    <string name="action_snooze_next_week">الأسبوع الجاي</string>
+    <string name="action_snooze_pick">اختيار تاريخ/وقت</string>
+    <string name="action_clear">مسح</string>
+    <string name="action_close">إغلاق</string>
+    <string name="action_restore">استرجاع</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_mark_done">تعليم كمنتهي</string>
+    <string name="cd_mark_open">إلغاء التعليم كمنتهي</string>
+    <string name="cd_add_task">إضافة مهمة</string>
+    <string name="cd_open_drawer">فتح القائمة</string>
+    <string name="cd_back">رجوع</string>
+    <string name="cd_search">بحث</string>
+
+    <!-- Task -->
+    <string name="task_title_hint">محتاج تعمل إيه؟</string>
+    <string name="task_title_label">العنوان</string>
+    <string name="task_notes_hint">ملاحظات</string>
+    <string name="task_notes_label">ملاحظات</string>
+    <string name="task_subtasks">مهام فرعية</string>
+    <string name="task_subtask_hint">إضافة مهمة فرعية</string>
+    <string name="chip_date">تاريخ</string>
+    <string name="chip_priority">أولوية</string>
+    <string name="chip_list">قائمة</string>
+    <string name="chip_tags">وسوم</string>
+    <string name="chip_reminder">تذكير</string>
+    <string name="priority_none">عادي</string>
+    <string name="priority_low">منخفضة</string>
+    <string name="priority_medium">متوسطة</string>
+    <string name="priority_high">عالية</string>
+
+    <!-- Views -->
+    <string name="empty_today_title">مفيش مهام النهاردة</string>
+    <string name="empty_today_body">اضغط على الزرار اللي تحت عشان تضيف أول مهمة.</string>
+    <string name="empty_upcoming_title">مفيش مهام قادمة</string>
+    <string name="empty_all_title">مفيش مهام</string>
+    <string name="empty_completed_title">مفيش مهام مكتملة</string>
+    <string name="empty_trash_title">سلة المحذوفات فاضية</string>
+    <string name="empty_search_title">مفيش نتائج</string>
+
+    <string name="overdue_banner">متأخرة (%1$d)</string>
+
+    <!-- Dates -->
+    <string name="today">النهاردة</string>
+    <string name="tomorrow">بكرة</string>
+    <string name="yesterday">إمبارح</string>
+
+    <!-- Alarm -->
+    <string name="alarm_heading">تذكير بمهمة</string>
+    <string name="alarm_no_title">(من غير عنوان)</string>
+
+    <!-- Reminders -->
+    <string name="reminder_at_due">في الموعد</string>
+    <string name="reminder_before">قبل</string>
+    <string name="reminder_absolute">وقت محدد</string>
+    <string name="reminder_none">مفيش تذكير</string>
+
+    <!-- Search -->
+    <string name="search_hint">ابحث في المهام</string>
+    <string name="search_filters">فلاتر</string>
+    <string name="filter_sort">ترتيب</string>
+    <string name="sort_due">تاريخ الاستحقاق</string>
+    <string name="sort_priority">الأولوية</string>
+    <string name="sort_created">تاريخ الإنشاء</string>
+    <string name="sort_manual">يدوي</string>
+
+    <!-- Settings -->
+    <string name="settings_general">عام</string>
+    <string name="settings_reminders">التذكيرات</string>
+    <string name="settings_backup">النسخ الاحتياطي</string>
+    <string name="settings_about">عن التطبيق</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_theme">المظهر</string>
+    <string name="settings_snooze_duration">مدة التأجيل الافتراضية</string>
+    <string name="settings_reliability_check">فحص الموثوقية</string>
+    <string name="settings_export">تصدير نسخة</string>
+    <string name="settings_import">استيراد نسخة</string>
+    <string name="theme_system">حسب النظام</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">غامق</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">إضافة سريعة</string>
+    <string name="onboarding_welcome_body">اكتب عنوان المهمة واحفظ. كل حاجة تانية اختيارية.</string>
+    <string name="onboarding_reminders_title">تذكيرات بتشتغل</string>
+    <string name="onboarding_reminders_body">تنبيهات دقيقة بتشتغل بعد إعادة التشغيل—even مع توفير البطارية.</string>
+    <string name="onboarding_privacy_title">خصوصية كاملة</string>
+    <string name="onboarding_privacy_body">كل البيانات على الموبايل بتاعك. مفيش حساب، مفيش سيرفر، مفيش تتبع.</string>
+    <string name="onboarding_next">التالي</string>
+    <string name="onboarding_skip">تخطي</string>
+    <string name="onboarding_start">يلا نبدأ</string>
+
+    <!-- Permissions -->
+    <string name="perm_notifications_title">الإشعارات</string>
+    <string name="perm_notifications_body">مطلوبة عشان التذكيرات توصلك.</string>
+    <string name="perm_exact_alarm_title">التنبيهات الدقيقة</string>
+    <string name="perm_exact_alarm_body">مطلوبة عشان التذكير يوصل في الدقيقة اللي اخترتها.</string>
+    <string name="perm_full_screen_title">منبه ملء الشاشة</string>
+    <string name="perm_full_screen_body">يخلي المهام المهمة ترنّ على شاشة القفل.</string>
+    <string name="perm_battery_title">توفير البطارية</string>
+    <string name="perm_battery_body">بعض الشركات بتوقف التنبيهات للتطبيقات اللي مش مستخدمة. استثناء التطبيق بيخلّي التذكيرات مضمونة.</string>
+    <string name="perm_grant">السماح</string>
+    <string name="perm_granted">تم السماح</string>
+    <string name="perm_continue">متابعة</string>
+
+    <!-- Backup -->
+    <string name="backup_choose_folder">اختر مجلد النسخ الاحتياطي</string>
+    <string name="backup_complete">النسخة اتحفظت</string>
+    <string name="backup_failed">النسخة فشلت. اختر المجلد تاني.</string>
+    <string name="backup_import_confirm">الاستيراد هيستبدل كل البيانات الحالية. تكمل؟</string>
+    <string name="backup_import_complete">الاستيراد خلص</string>
+    <string name="backup_import_failed">الاستيراد فشل</string>
+    <string name="backup_no_folder">لسه مفيش مجلد متختار</string>
+
+    <!-- Reliability -->
+    <string name="reliability_title">موثوقية التذكيرات</string>
+    <string name="reliability_ok">كله تمام</string>
+    <string name="reliability_issue">محتاج تظبط</string>
+
+    <!-- Trash -->
+    <string name="trash_retention">المهام في سلة المحذوفات بتتشال بعد 30 يوم.</string>
+    <string name="task_deleted">المهمة اتحذفت</string>
+    <string name="task_completed">المهمة اكتملت</string>
+    <string name="task_postponed">المهمة اتأجلت</string>
+</resources>

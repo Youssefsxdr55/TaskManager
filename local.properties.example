@@ -1,0 +1,4 @@
+
+# Copy to local.properties and adjust for your machine.
+# Windows:
+sdk.dir=C\\:\\Users\\YOUR_USER\\AppData\\Local\\Android\\Sdk

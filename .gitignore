@@ -1,0 +1,35 @@
+
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+keystore.properties
+*.jks
+*.keystore
+
+# Never commit build outputs to a public repository.
+*.apk
+*.aab
+app/release/
+app/debug/
+*.ap_
+*.dex
+*.class
+
+# Room exports its schema JSON; keep the folder but not local scratch copies.
+app/schemas/*/room_master_table.json.tmp
+
+# OS and editor noise
+Thumbs.db
+desktop.ini
+*.swp
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.vscode/
+
