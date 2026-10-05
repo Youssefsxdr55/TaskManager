@@ -33,3 +33,6 @@ desktop.ini
 .idea/**/tasks.xml
 .vscode/
 
+# Local CI debug output
+ci-error.log
+
