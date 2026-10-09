@@ -63,7 +63,7 @@ import com.joe.taskmanager.data.local.entity.TaskTag
         RewardRedemption::class,
         BadgeUnlock::class,
         Event::class,
-        // SearchableTask::class
+        SearchableTask::class
     ],
     version = 1,
     exportSchema = true
@@ -82,8 +82,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun habitDao(): HabitDao
     abstract fun seriesDao(): SeriesDao
     abstract fun focusDao(): FocusDao
-    // abstract fun searchableTaskDao(): SearchableTaskDao
-    // abstract fun searchIndexDao(): SearchIndexDao
+    abstract fun searchableTaskDao(): SearchableTaskDao
+    abstract fun searchIndexDao(): SearchIndexDao
     abstract fun taskIndexQueriesDao(): TaskIndexQueriesDao
 
     companion object {
