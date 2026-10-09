@@ -307,3 +307,4 @@ private fun android.database.Cursor.getIntOrNull(index: Int): Int? =
 
 private fun android.database.Cursor.getStringOrNull(index: Int): String? =
     if (isNull(index)) null else getString(index)
+private fun android.database.Cursor.getIntSafe(i:Int)=getInt(i)

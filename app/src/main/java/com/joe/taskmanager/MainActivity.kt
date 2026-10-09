@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         splash.setKeepOnScreenCondition { !ready.value }
 
         setContent {
-        val settings by settingsRepository.settings
+            val settings by settingsRepository.settings
                 .stateIn(
                     scope = lifecycleScope,
                     started = SharingStarted.Eagerly,
