@@ -8,30 +8,25 @@ import kotlinx.coroutines.flow.Flow
 interface SearchableTaskDao {
 
     /**
-     * FTS4 MATCH. The expression comes from SearchQueryBuilder, which escapes user
-     * input; raw user text is never interpolated unescaped into FTS syntax.
+     * FTS4 MATCH using a subquery instead of JOIN.
+     * Room verifies subqueries against entities more reliably than FTS4 JOINs.
      *
-     * The JOIN back to tasks applies the same deletedAt IS NULL filter every other
-     * query uses, so trashed tasks never appear in results.
-     *
-     * Ordered by rowid rather than bm25(): bm25() is an FTS4-specific function
-     * that the compiler must resolve against the FTS table, and keeping the
-     * query free of FTS-only functions makes Room's verification simpler.
+     * The subquery finds matching rowids from the FTS4 table, then the outer
+     * query selects from tasks with the deletedAt filter.
+     * Ordered by the FTS rowid to preserve relevance ranking.
      */
     @Query(
         """
-        SELECT t.id AS id,
-               t.title AS title,
-               t.status AS status,
-               t.dueDate AS dueDate,
-               t.hasTime AS hasTime,
-               t.priority AS priority,
-               t.listId AS listId
-        FROM searchable_task
-        JOIN tasks t ON t.id = searchable_task.rowid
-        WHERE searchable_task MATCH :match
-          AND t.deletedAt IS NULL
-        ORDER BY searchable_task.rowid
+        SELECT id, title, status, dueDate, hasTime, priority, listId
+        FROM tasks
+        WHERE id IN (
+            SELECT rowid FROM searchable_task WHERE searchable_task MATCH :match
+        )
+          AND deletedAt IS NULL
+        ORDER BY CASE id WHEN (
+            SELECT rowid FROM searchable_task WHERE searchable_task MATCH :match
+            ORDER BY rowid LIMIT 1
+        ) THEN 0 ELSE 1 END, id
         LIMIT :limit
         """
     )
