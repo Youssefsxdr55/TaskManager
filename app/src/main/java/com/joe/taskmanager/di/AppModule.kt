@@ -45,8 +45,8 @@ object AppModule {
     @Provides fun provideHabitDao(db: AppDatabase): HabitDao = db.habitDao()
     @Provides fun provideSeriesDao(db: AppDatabase): SeriesDao = db.seriesDao()
     @Provides fun provideFocusDao(db: AppDatabase): FocusDao = db.focusDao()
-    @Provides fun provideSearchableTaskDao(db: AppDatabase): SearchableTaskDao = db.searchableTaskDao()
-    @Provides fun provideSearchIndexDao(db: AppDatabase): SearchIndexDao = db.searchIndexDao()
+    // @Provides fun provideSearchableTaskDao(db: AppDatabase): SearchableTaskDao = db.searchableTaskDao()
+    // @Provides fun provideSearchIndexDao(db: AppDatabase): SearchIndexDao = db.searchIndexDao()
     @Provides fun provideTaskIndexQueriesDao(db: AppDatabase): TaskIndexQueriesDao = db.taskIndexQueriesDao()
 
     @Provides
