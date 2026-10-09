@@ -2,6 +2,7 @@
 package com.joe.taskmanager
 
 import android.os.Bundle
+import androidx.compose.runtime.collectAsState
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,12 +36,12 @@ class MainActivity : ComponentActivity() {
         splash.setKeepOnScreenCondition { !ready.value }
 
         setContent {
-            val settings by settingsRepository.settings
+        val settings by settingsRepository.settings
                 .stateIn(
                     scope = lifecycleScope,
                     started = SharingStarted.Eagerly,
                     initialValue = null
-                )
+                ).collectAsState()
             ready.value = settings != null
 
             val value = settings
