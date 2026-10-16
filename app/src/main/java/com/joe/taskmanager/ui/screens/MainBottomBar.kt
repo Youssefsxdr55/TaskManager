@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.composeunstyled.UnstyledButton
+import com.composeunstyled.Button
 import com.joe.taskmanager.R
 
 enum class MainTab { TODAY, UPCOMING, CALENDAR }
@@ -85,7 +85,7 @@ private fun MainTabButton(
     onClick: () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
-    UnstyledButton(
+    Button(
         onClick = onClick,
         modifier = modifier
             .height(54.dp)
@@ -93,19 +93,15 @@ private fun MainTabButton(
             .background(if (selected) colors.primary.copy(alpha = 0.12f) else colors.surface),
         contentPadding = PaddingValues(horizontal = 4.dp, vertical = 5.dp),
         indication = LocalIndication.current,
-        contentAlignment = Alignment.Center
+        contentColor = if (selected) colors.primary else colors.onSurfaceVariant,
+        horizontalArrangement = Arrangement.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            androidx.compose.runtime.CompositionLocalProvider(
-                androidx.compose.material3.LocalContentColor provides
-                    if (selected) colors.primary else colors.onSurfaceVariant
-            ) {
-                icon()
-                Text(label, style = MaterialTheme.typography.labelSmall, maxLines = 1)
-            }
+            icon()
+            Text(label, style = MaterialTheme.typography.labelSmall, maxLines = 1)
         }
     }
 }
