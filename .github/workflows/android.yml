@@ -1,28 +1,23 @@
 name: Android CI
 
-# PRD 4.4: every push builds a debug APK; tagged releases build a signed release APK
-# and attach it to the GitHub Release. The signing keystore lives in GitHub Secrets.
+# PRD 4.4: every push builds a debug APK; tagged releases build a signed APK.
 
 on:
   push:
-    branches: [ main, master ]
-    tags: [ 'v*' ]
+    branches: [main, master]
+    tags: ['v*.*.*']
   pull_request:
-    branches: [ main, master ]
-  # Manual "Build APK" button in the Actions tab.
+    branches: [main, master]
   workflow_dispatch:
     inputs:
       build_type:
-        description: 'What to build'
+        description: What to build
         type: choice
         required: true
         default: debug
-        options:
-          - debug     # debug APK, no signing needed
-          - release   # unsigned release APK
-          - test      # unit tests only
+        options: [debug, release, test]
       run_tests:
-        description: 'Run unit tests'
+        description: Run unit tests
         type: boolean
         required: false
         default: true
@@ -36,39 +31,33 @@ permissions:
 
 jobs:
   build:
-    name: Build debug APK + unit tests
+    name: Build APK and unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v4
 
       - name: Run unit tests
-        # Covers the pure logic: recurrence, points, streaks, search, dates.
-        # On a manual run this can be switched off to build faster.
         if: github.event_name != 'workflow_dispatch' || inputs.run_tests
         run: ./gradlew --no-daemon :app:testDebugUnitTest
-
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-reports
           path: app/build/reports/tests/
+          if-no-files-found: ignore
           retention-days: 7
 
       - name: Assemble debug APK
         if: github.event_name != 'workflow_dispatch' || inputs.build_type == 'debug'
         run: ./gradlew --no-daemon :app:assembleDebug
-
-      - name: Assemble release APK (unsigned)
+      - name: Assemble unsigned release APK
         if: github.event_name == 'workflow_dispatch' && inputs.build_type == 'release'
         run: ./gradlew --no-daemon :app:assembleRelease
 
@@ -76,16 +65,17 @@ jobs:
         if: github.event_name != 'workflow_dispatch' || inputs.build_type == 'debug'
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
+          name: taskmanager-debug-apk
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
           retention-days: 14
-
-      - name: Upload release APK
+      - name: Upload unsigned release APK
         if: github.event_name == 'workflow_dispatch' && inputs.build_type == 'release'
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk-unsigned
+          name: taskmanager-release-apk-unsigned
           path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
           retention-days: 14
 
       - name: Summary
@@ -98,7 +88,6 @@ jobs:
 
   release:
     name: Signed release APK
-    # Only on version tags, so a normal push never needs the signing secrets.
     if: startsWith(github.ref, 'refs/tags/v')
     needs: build
     runs-on: ubuntu-latest
@@ -106,46 +95,32 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      # The keystore is base64-encoded in the KEystore_B64 secret so no binary
-      # ever lives in the repository.
-      - name: Decode signing keystore
+      - name: Prepare release signing key
         env:
-          KEYSTORE_B64: ${{ secrets.KEystore_B64 }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          mkdir -p keystore
-          echo "$KEYSTORE_B64" | base64 -d > keystore/taskmanager.jks
-          echo "Decoded keystore: $(ls -la keystore/)"
-
-      - name: Assemble signed release APK
-        env:
-          STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-        run: |
-          cat > keystore.properties <<EOF
-          storeFile=keystore/taskmanager.jks
-          storePassword=$STORE_PASSWORD
-          keyAlias=$KEY_ALIAS
-          keyPassword=$KEY_PASSWORD
-          EOF
-          ./gradlew --no-daemon :app:assembleRelease
-
+          test -n "$KEYSTORE_BASE64" && test -n "$KEYSTORE_PASSWORD" && test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > release-upload.jks
+          {
+            printf 'storeFile=release-upload.jks\n'
+            printf 'storePassword=%s\n' "$KEYSTORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$KEY_PASSWORD"
+          } > keystore.properties
+      - name: Build signed release APK
+        run: ./gradlew --no-daemon :app:assembleRelease
       - name: Publish to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
-        run: |
-          gh release create "$TAG" \
-            app/build/outputs/apk/release/*.apk \
-            --title "$TAG" \
-            --generate-notes
+        run: gh release create "$TAG" app/build/outputs/apk/release/*.apk --title "$TAG" --generate-notes

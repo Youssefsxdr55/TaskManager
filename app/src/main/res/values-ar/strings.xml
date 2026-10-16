@@ -46,6 +46,7 @@
     <string name="task_subtasks">مهام فرعية</string>
     <string name="task_subtask_hint">إضافة مهمة فرعية</string>
     <string name="chip_date">تاريخ</string>
+    <string name="chip_time">وقت</string>
     <string name="chip_priority">أولوية</string>
     <string name="chip_list">قائمة</string>
     <string name="chip_tags">وسوم</string>
@@ -78,6 +79,7 @@
     <!-- Reminders -->
     <string name="reminder_at_due">في الموعد</string>
     <string name="reminder_before">قبل</string>
+    <string name="reminder_before_minutes">قبل %1$d دقيقة</string>
     <string name="reminder_absolute">وقت محدد</string>
     <string name="reminder_none">مفيش تذكير</string>
 
@@ -148,4 +150,84 @@
     <string name="task_deleted">المهمة اتحذفت</string>
     <string name="task_completed">المهمة اكتملت</string>
     <string name="task_postponed">المهمة اتأجلت</string>
+    <string name="tag_add">إضافة وسم</string>
+    <string name="tag_edit_title">تعديل الوسم</string>
+    <string name="tag_edit">تعديل %1$s</string>
+    <string name="tag_name">الاسم</string>
+    <string name="tag_color">اللون</string>
+    <string name="tags_empty">لا توجد وسوم بعد</string>
+    <string name="color_brown">بني</string>
+    <string name="color_blue">أزرق</string>
+    <string name="color_green">أخضر</string>
+    <string name="color_purple">بنفسجي</string>
+    <string name="color_red">أحمر</string>
+    <string name="tag_delete_title">حذف الوسم؟</string>
+    <string name="tag_delete_confirm">ستُزال علامة %1$s من المهام.</string>
+    <string name="nav_organization">المجلدات والقوائم</string>
+    <string name="organization_add_folder">إضافة مجلد</string>
+    <string name="organization_add_list">إضافة قائمة</string>
+    <string name="organization_add_sublist">إضافة قائمة فرعية</string>
+    <string name="organization_name">الاسم</string>
+    <string name="organization_empty">لا توجد مجلدات أو قوائم بعد</string>
+    <string name="onboarding_permissions_title">إعداد التذكيرات الموثوقة</string>
+    <string name="onboarding_permissions_body">تساعد هذه الإعدادات الاختيارية على وصول التذكيرات في موعدها. يمكنك تغييرها لاحقًا من الإعدادات.</string>
+    <string name="onboarding_open_settings">مراجعة الأذونات</string>
+    <string name="action_back">رجوع</string>
+    <string name="filter_any">الكل</string>
+    <string name="filter_list">القائمة</string>
+    <string name="filter_tag">الوسم</string>
+    <string name="filter_priority">الأولوية</string>
+    <string name="filter_status">الحالة</string>
+    <string name="filter_date">التاريخ</string>
+    <string name="filter_open">مفتوحة</string>
+    <string name="filter_completed">مكتملة</string>
+    <string name="filter_today">اليوم</string>
+    <string name="filter_next_7_days">الأيام السبعة القادمة</string>
+    <string name="filter_overdue">متأخرة</string>
+    <string name="chip_reminder_count">التذكيرات (%1$d)</string>
+    <string name="reminder_before_hour">قبل ساعة</string>
+    <string name="reminder_before_day">قبل يوم</string>
+    <string name="organization_delete_title">حذف %1$s؟</string>
+    <string name="organization_delete_body">اختار مصير المهام والقوائم الفرعية.</string>
+    <string name="organization_move_to_inbox">نقل المهام إلى الوارد</string>
+    <string name="organization_delete_tasks">نقل المهام إلى المحذوفات</string>
+    <string name="nav_habits">العادات</string><string name="habit_add">إضافة عادة</string><string name="habit_name">اسم العادة</string><string name="habit_numeric">متابعة هدف رقمي</string><string name="habit_target">الهدف اليومي</string><string name="habit_unit">الوحدة (اختياري)</string><string name="habits_empty">لا توجد عادات بعد. أضف عادة لبدء المتابعة.</string><string name="habit_points">النقاط: %1$d</string><string name="habit_streak">السلسلة الحالية: %1$d يوم</string><string name="habit_done_today">أُنجزت اليوم</string><string name="habit_mark_done">تحديد اليوم كمكتمل</string><string name="habit_progress">قيمة اليوم</string><string name="action_archive">أرشفة</string>
+    <string name="nav_rewards">المكافآت</string><string name="reward_add">إضافة مكافأة</string><string name="reward_edit">تعديل المكافأة</string><string name="reward_name">اسم المكافأة</string><string name="reward_emoji">رمز تعبيري (اختياري)</string><string name="reward_cost_label">تكلفة النقاط</string><string name="reward_note">ملاحظة (اختيارية)</string><string name="reward_balance">الرصيد: %1$d نقطة</string><string name="reward_lifetime">إجمالي المكتسب: %1$d نقطة</string><string name="reward_cost">التكلفة: %1$d نقطة</string><string name="reward_redeem">استبدال</string><string name="rewards_empty">لا توجد مكافآت بعد. أضف مكافأة لتدخر من أجلها.</string><string name="reward_history">سجل الاستبدال</string><string name="reward_no_redemptions">لا توجد عمليات استبدال بعد</string><string name="reward_history_entry">تم استبدال مكافأة مقابل %1$d نقطة</string><string name="action_edit">تعديل</string>
+<string name="points_reset">إعادة ضبط النقاط</string><string name="points_reset_confirm">سيعود رصيدك إلى صفر مع الاحتفاظ بسجل النقاط.</string>
+<string name="nav_recurrence">المهام المتكررة</string><string name="recurrence_add">إضافة مهمة متكررة</string><string name="recurrence_empty">لا توجد مهام متكررة بعد</string><string name="recurrence_interval">كل فترة</string><string name="recurrence_weekdays">أيام محددة من الأسبوع</string><string name="recurrence_monthly">شهريًا حسب اليوم</string><string name="recurrence_yearly">سنويًا</string><string name="recurrence_every">التكرار كل</string><string name="recurrence_day">يوم الشهر (1–31)</string><string name="recurrence_year_day">يوم السنة (1–31)</string><string name="weekday_sat">سبت</string><string name="weekday_sun">أحد</string><string name="weekday_mon">اثن</string><string name="weekday_tue">ثلا</string><string name="weekday_wed">أرب</string><string name="weekday_thu">خمي</string><string name="weekday_fri">جمع</string>
+<string name="habit_schedule">أيام الجدول</string><string name="habit_threshold">حد احتساب السلسلة (%)</string>
+<string name="habit_best_rate">الأفضل: %1$d يوم · الإنجاز خلال 30 يومًا: %2$d%%</string>
+<string name="badges_title">الشارات</string><string name="badge_first_task">أكملت أول مهمة</string><string name="badge_tasks_10">أكملت 10 مهام</string><string name="badge_tasks_100">أكملت 100 مهمة</string><string name="badge_tasks_1000">أكملت 1000 مهمة</string><string name="badge_habit_7">سلسلة عادات لمدة 7 أيام</string><string name="badge_habit_30">سلسلة عادات لمدة 30 يومًا</string><string name="badge_generic">إنجاز جديد</string>
+<string name="reward_level">المستوى %1$d</string>
+<string name="month_jan">يناير</string><string name="month_feb">فبراير</string><string name="month_mar">مارس</string><string name="month_apr">أبريل</string><string name="month_may">مايو</string><string name="month_jun">يونيو</string><string name="month_jul">يوليو</string><string name="month_aug">أغسطس</string><string name="month_sep">سبتمبر</string><string name="month_oct">أكتوبر</string><string name="month_nov">نوفمبر</string><string name="month_dec">ديسمبر</string>
+<string name="nav_calendar">التقويم</string><string name="calendar_no_tasks">لا توجد مهام في هذا اليوم</string>
+<string name="quick_add_parse">استخراج التاريخ والوقت</string><string name="quick_add_review">راجع العنوان والتاريخ والوقت وعدّلها قبل الحفظ.</string>
+<string name="nav_insights">الإحصاءات</string><string name="insight_tasks">المهام المكتملة</string><string name="insight_focus">وقت التركيز</string><string name="insight_habits">الالتزام بالعادات</string><string name="insight_points">النقاط</string><string name="insight_comparison">هذا الأسبوع: %1$d%2$s · الأسبوع السابق: %3$d%4$s</string><string name="minutes_short"> د</string><string name="insight_best_day">أفضل يوم: %1$s</string><string name="insight_postponed">مهام كثيرة التأجيل</string><string name="insight_no_alerts">لا توجد تنبيهات تأجيل</string><string name="insight_postponed_item">تم تأجيلها %1$d مرات. اضغط للمراجعة.</string>
+<string name="settings_postpone_threshold">حد تنبيه التأجيل</string>
+<string name="nav_focus">مؤقت التركيز</string><string name="focus_phase">تركيز</string><string name="focus_break_phase">استراحة</string><string name="focus_phase_ready">انتهت المرحلة. ابدأ المرحلة التالية عندما تكون جاهزًا.</string><string name="focus_running">المؤقت يعمل</string><string name="focus_paused">المؤقت متوقف مؤقتًا</string><string name="focus_start_next">بدء المرحلة التالية</string><string name="focus_resume">استئناف</string><string name="focus_pause">إيقاف مؤقت</string><string name="focus_stop">إيقاف</string><string name="focus_sessions_completed">جلسات تركيز مكتملة: %1$d</string><string name="focus_minutes">دقائق التركيز</string><string name="focus_short_break">استراحة قصيرة</string><string name="focus_long_break">استراحة طويلة</string><string name="focus_sessions_before_long">الجلسات قبل الاستراحة الطويلة</string><string name="focus_link_task">ربط بمهمة (اختياري)</string><string name="focus_no_task">بدون مهمة</string><string name="focus_do_not_disturb">كتم الإشعارات أثناء التركيز</string><string name="focus_grant_dnd">السماح بوصول عدم الإزعاج</string><string name="focus_auto_start">بدء المرحلة التالية تلقائيًا</string><string name="focus_start">بدء جلسة التركيز</string>
+<string name="habit_reminder_title">تذكير بالعادات</string>
+<plurals name="habit_reminder_body"><item quantity="zero">لا توجد عادات تحتاج إلى تسجيل.</item><item quantity="one">لديك عادة واحدة تحتاج إلى تسجيل.</item><item quantity="two">لديك عادتان تحتاجان إلى تسجيل.</item><item quantity="few">لديك %1$d عادات تحتاج إلى تسجيل.</item><item quantity="many">لديك %1$d عادة تحتاج إلى تسجيل.</item><item quantity="other">لديك %1$d عادة تحتاج إلى تسجيل.</item></plurals>
+<string name="settings_habit_reminder">تذكير العادات مساءً</string>
+<string name="habit_increase">زيادة تقدم العادة</string><string name="habit_decrease">تقليل تقدم العادة</string>
+<string name="badge_focus_hour">أول ساعة تركيز</string><string name="badge_focus_10_hours">10 ساعات تركيز</string>
+<string name="calendar_week_view">عرض أسبوعي</string><string name="calendar_month_view">عرض شهري</string>
+<string name="calendar_no_habit_logs">لا توجد تسجيلات عادات في هذا اليوم</string>
+    <string name="insight_best_hour">أكثر ساعة إنجازًا: %1$02d:00</string>
+    <string name="insight_habit_heatmap">إنجاز العادات · الأسابيع الأربعة الماضية</string>
+    <string name="badge_perfect_day">يوم مثالي</string>
+    <string name="badge_comeback">العودة بعد رصيد سالب</string>
+    <string name="recurrence_stop">إيقاف السلسلة</string>
+    <string name="recurrence_stop_title">إيقاف المهمة المتكررة؟</string>
+    <string name="recurrence_stop_confirm">ستنقل التكرارات المستقبلية المفتوحة من «%1$s» إلى سلة المهملات.</string>
+    <string name="recurrence_last_day">آخر يوم في الشهر</string>
+    <string name="recurrence_month">الشهر (1–12)</string>
+    <string name="recurrence_desc_interval">كل %1$d %2$s</string>
+    <string name="recurrence_unit_day">أيام</string>
+    <string name="recurrence_unit_week">أسابيع</string>
+    <string name="recurrence_unit_month">أشهر</string>
+    <string name="recurrence_desc_weekdays">أيام الأسبوع المحددة</string>
+    <string name="recurrence_desc_last_day">آخر يوم من كل شهر</string>
+    <string name="recurrence_desc_month_day">شهريًا في اليوم %1$d</string>
+    <string name="recurrence_desc_yearly">سنويًا في %1$d/%2$d</string>
+    <string name="recurrence_desc_default">مهمة متكررة</string>
 </resources>

@@ -1,8 +1,8 @@
 
 package com.joe.taskmanager.ui.screens
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.joe.taskmanager.R
-
 /** Shared scaffold so every screen has the same app bar and snackbar behaviour. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,12 +34,14 @@ fun ScreenScaffold(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     floatingActionButton: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
+    topBarActions: @Composable RowScope.() -> Unit = {},
     content: @Composable (Modifier) -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(title, style = MaterialTheme.typography.titleLarge) },
+                actions = topBarActions,
                 navigationIcon = {
                     if (onBack != null) {
                         IconButton(onClick = onBack) {
@@ -63,7 +64,6 @@ fun ScreenScaffold(
         content(Modifier.padding(padding))
     }
 }
-
 /** Centered empty state used by every list when it has nothing to show. */
 @Composable
 fun EmptyState(title: String, body: String? = null, modifier: Modifier = Modifier) {

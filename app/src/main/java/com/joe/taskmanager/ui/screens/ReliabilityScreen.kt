@@ -46,7 +46,7 @@ fun ReliabilityScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .then(padding)
                 .verticalScroll(rememberScrollState())
         ) {
             CheckRow(

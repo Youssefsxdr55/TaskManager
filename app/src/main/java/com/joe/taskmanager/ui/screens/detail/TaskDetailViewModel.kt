@@ -1,7 +1,11 @@
 
 package com.joe.taskmanager.ui.screens.detail
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
+import com.joe.taskmanager.ui.navigation.longArg
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joe.taskmanager.data.local.entity.Reminder
@@ -36,9 +40,13 @@ class TaskDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    var showSnooze: Boolean = false
+    var showSnooze by mutableStateOf(false)
+        private set
 
-    private val taskId: Long = savedStateHandle.get<String>("taskId")?.toLongOrNull() ?: -1L
+    fun openSnooze() { showSnooze = true }
+    fun closeSnooze() { showSnooze = false }
+
+    private val taskId: Long = savedStateHandle.longArg("taskId") ?: -1L
 
     val uiState: StateFlow<TaskDetailUiState> = combine(
         repository.observeTask(taskId),
@@ -65,7 +73,7 @@ class TaskDetailViewModel @Inject constructor(
      * TASK_POSTPONED event so postponement analytics and the v1.3 alert work.
      */
     fun snooze(choice: SnoozeChoice) {
-        showSnooze = false
+        closeSnooze()
         viewModelScope.launch {
             val task = repository.getTask(taskId) ?: return@launch
             val now = System.currentTimeMillis()

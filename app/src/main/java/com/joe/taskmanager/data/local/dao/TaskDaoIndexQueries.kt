@@ -44,7 +44,15 @@ interface TaskIndexQueriesDao {
     )
     suspend fun indexSourceRows(): List<IndexSourceRow>
 
-    /** Cheap invalidation signal: emits whenever any task row changes. */
-    @Query("SELECT COUNT(*) FROM tasks")
+    /** Invalidates for every source table used by the FTS aggregation. */
+    @Query(
+        """
+        SELECT
+            (SELECT COUNT(*) FROM tasks) +
+            (SELECT COUNT(*) FROM subtasks) +
+            (SELECT COUNT(*) FROM task_tags) +
+            (SELECT COUNT(*) FROM tags)
+        """
+    )
     fun observeIndexSignal(): Flow<Int>
 }

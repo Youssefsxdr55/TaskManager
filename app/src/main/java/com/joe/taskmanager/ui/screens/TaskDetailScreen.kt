@@ -1,6 +1,5 @@
 
 package com.joe.taskmanager.ui.screens
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +24,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.joe.taskmanager.R
 import com.joe.taskmanager.ui.components.SnoozeSheet
 import com.joe.taskmanager.ui.screens.detail.TaskDetailViewModel
-
 @Composable
 fun TaskDetailScreen(
     taskId: Long,
@@ -34,21 +32,19 @@ fun TaskDetailScreen(
     viewModel: TaskDetailViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-
     ScreenScaffold(
         title = state.title.ifBlank { stringResource(R.string.task_title_label) },
         onBack = onBack
     ) { padding ->
         val task = state.task
         if (task == null) {
-            EmptyState(stringResource(R.string.empty_search_title), modifier = Modifier.padding(padding))
+            EmptyState(stringResource(R.string.empty_search_title), modifier = Modifier.then(padding))
             return@ScreenScaffold
         }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .then(padding)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -58,7 +54,6 @@ fun TaskDetailScreen(
                 color = if (task.isOverdue) MaterialTheme.colorScheme.error
                         else MaterialTheme.colorScheme.onBackground
             )
-
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -66,16 +61,14 @@ fun TaskDetailScreen(
                 TextButton(onClick = { viewModel.toggleComplete() }) {
                     Text(stringResource(if (state.completed) R.string.cd_mark_open else R.string.cd_mark_done))
                 }
-                TextButton(onClick = { viewModel.showSnooze = true }) {
+                TextButton(onClick = { viewModel.openSnooze() }) {
                     Text(stringResource(R.string.action_snooze))
                 }
                 TextButton(onClick = onEdit) {
                     Text(stringResource(R.string.action_save))
                 }
             }
-
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
             if (task.notes.isNotBlank()) {
                 Text(
                     text = task.notes,
@@ -83,7 +76,6 @@ fun TaskDetailScreen(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
-
             if (state.subtasks.isNotEmpty()) {
                 Text(
                     text = stringResource(R.string.task_subtasks),
@@ -108,7 +100,6 @@ fun TaskDetailScreen(
                     }
                 }
             }
-
             if (state.tags.isNotEmpty()) {
                 Text(
                     text = stringResource(R.string.chip_tags) + ": " +
@@ -118,7 +109,6 @@ fun TaskDetailScreen(
                     modifier = Modifier.padding(top = 24.dp)
                 )
             }
-
             if (state.reminders.isNotEmpty()) {
                 Text(
                     text = stringResource(R.string.chip_reminder) + ": " +
@@ -128,7 +118,6 @@ fun TaskDetailScreen(
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
-
             TextButton(
                 onClick = { viewModel.moveToTrash(onDeleted = onBack) },
                 modifier = Modifier.padding(top = 32.dp)
@@ -139,10 +128,9 @@ fun TaskDetailScreen(
                 )
             }
         }
-
-        if (state.showSnooze) {
+        if (viewModel.showSnooze) {
             SnoozeSheet(
-                onDismiss = { viewModel.showSnooze = false },
+                onDismiss = { viewModel.closeSnooze() },
                 onPick = { viewModel.snooze(it) }
             )
         }

@@ -4,7 +4,7 @@ package com.joe.taskmanager.reminder
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.joe.taskmanager.notification.ReminderContract
+import com.joe.taskmanager.reminder.ReminderContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

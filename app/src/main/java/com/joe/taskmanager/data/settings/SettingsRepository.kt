@@ -3,6 +3,7 @@ package com.joe.taskmanager.data.settings
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -12,6 +13,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Calendar
 import java.util.Locale
@@ -79,7 +81,10 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setTheme(mode: ThemeMode) = context.dataStore.edit { it[Keys.THEME] = mode.name }
 
-    suspend fun setLanguage(tag: String) = context.dataStore.edit { it[Keys.LANGUAGE] = tag }
+    suspend fun setLanguage(tag: String) {
+        context.dataStore.edit { it[Keys.LANGUAGE] = tag }
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(if (tag == "system") "" else tag))
+    }
 
     suspend fun setSnoozeMinutes(minutes: Int) = context.dataStore.edit { it[Keys.SNOOZE_MINUTES] = minutes }
 
@@ -94,13 +99,72 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setOnboardingComplete(done: Boolean) = context.dataStore.edit { it[Keys.ONBOARDING_DONE] = done }
 
-    suspend fun setBackupFolder(uri: String?) = context.dataStore.edit { it[Keys.BACKUP_FOLDER_URI] = uri }
+    suspend fun setBackupFolder(uri: String?) = context.dataStore.edit {
+        if (uri == null) it.remove(Keys.BACKUP_FOLDER_URI) else it[Keys.BACKUP_FOLDER_URI] = uri
+    }
 
     suspend fun setBackupRetention(count: Int) = context.dataStore.edit { it[Keys.BACKUP_RETENTION] = count }
 
-    suspend fun setLastBackupDate(date: String?) = context.dataStore.edit { it[Keys.LAST_BACKUP_DATE] = date }
+    suspend fun setLastBackupDate(date: String?) = context.dataStore.edit {
+        if (date == null) it.remove(Keys.LAST_BACKUP_DATE) else it[Keys.LAST_BACKUP_DATE] = date
+    }
 
-    suspend fun setLastDayCloseDate(date: String?) = context.dataStore.edit { it[Keys.LAST_DAY_CLOSE_DATE] = date }
+    suspend fun setLastDayCloseDate(date: String?) = context.dataStore.edit {
+        if (date == null) it.remove(Keys.LAST_DAY_CLOSE_DATE) else it[Keys.LAST_DAY_CLOSE_DATE] = date
+    }
+
+    /** Stable string representation used by the versioned backup format. */
+    suspend fun exportableSettings(): Map<String, String> {
+        val value = settings.first()
+        return buildMap {
+            put("themeMode", value.themeMode.name)
+            put("language", value.language)
+            put("defaultSnoozeMinutes", value.defaultSnoozeMinutes.toString())
+            put("fullScreenAlarmEnabled", value.fullScreenAlarmEnabled.toString())
+            put("habitReminderHour", value.habitReminderHour.toString())
+            put("habitReminderMinute", value.habitReminderMinute.toString())
+            put("postponeAlertThreshold", value.postponeAlertThreshold.toString())
+            put("onboardingComplete", value.onboardingComplete.toString())
+            put("backupRetention", value.backupRetention.toString())
+            value.backupFolderUri?.let { put("backupFolderUri", it) }
+            value.lastBackupDate?.let { put("lastBackupDate", it) }
+            value.lastDayCloseDate?.let { put("lastDayCloseDate", it) }
+        }
+    }
+
+    suspend fun restoreExportableSettings(values: Map<String, String>) = context.dataStore.edit { p ->
+        p.remove(Keys.THEME)
+        p.remove(Keys.LANGUAGE)
+        p.remove(Keys.SNOOZE_MINUTES)
+        p.remove(Keys.FULL_SCREEN_ENABLED)
+        p.remove(Keys.HABIT_REMINDER_HOUR)
+        p.remove(Keys.HABIT_REMINDER_MINUTE)
+        p.remove(Keys.POSTPONE_ALERT_THRESHOLD)
+        p.remove(Keys.ONBOARDING_DONE)
+        p.remove(Keys.BACKUP_FOLDER_URI)
+        p.remove(Keys.BACKUP_RETENTION)
+        p.remove(Keys.LAST_BACKUP_DATE)
+        p.remove(Keys.LAST_DAY_CLOSE_DATE)
+        values["themeMode"]?.let { raw -> runCatching { ThemeMode.valueOf(raw) }.getOrNull()?.let { p[Keys.THEME] = it.name } }
+        values["language"]?.let { p[Keys.LANGUAGE] = it }
+        values["defaultSnoozeMinutes"]?.toIntOrNull()?.coerceIn(1, 120)?.let { p[Keys.SNOOZE_MINUTES] = it }
+        values["fullScreenAlarmEnabled"]?.toBooleanStrictOrNull()?.let { p[Keys.FULL_SCREEN_ENABLED] = it }
+        values["habitReminderHour"]?.toIntOrNull()?.takeIf { it in 0..23 }?.let { p[Keys.HABIT_REMINDER_HOUR] = it }
+        values["habitReminderMinute"]?.toIntOrNull()?.takeIf { it in 0..59 }?.let { p[Keys.HABIT_REMINDER_MINUTE] = it }
+        values["postponeAlertThreshold"]?.toIntOrNull()?.coerceAtLeast(1)?.let { p[Keys.POSTPONE_ALERT_THRESHOLD] = it }
+        values["onboardingComplete"]?.toBooleanStrictOrNull()?.let { p[Keys.ONBOARDING_DONE] = it }
+        values["backupRetention"]?.toIntOrNull()?.coerceIn(1, 90)?.let { p[Keys.BACKUP_RETENTION] = it }
+        values["backupFolderUri"]?.let { uri ->
+            // SAF grants are tied to this install/device; restore the URI only if
+            // Android still holds the matching persisted write permission.
+            val hasGrant = context.contentResolver.persistedUriPermissions.any {
+                it.uri.toString() == uri && it.isReadPermission && it.isWritePermission
+            }
+            if (hasGrant) p[Keys.BACKUP_FOLDER_URI] = uri
+        }
+        values["lastBackupDate"]?.let { p[Keys.LAST_BACKUP_DATE] = it }
+        values["lastDayCloseDate"]?.let { p[Keys.LAST_DAY_CLOSE_DATE] = it }
+    }
 
     /** Called once at startup so the very first frame already uses the right theme. */
     suspend fun applyStoredTheme() {
@@ -116,6 +180,8 @@ class SettingsRepository @Inject constructor(
                 ThemeMode.DARK -> AppCompatDelegate.MODE_NIGHT_YES
             }
         )
+        val language = settings.first().language
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(if (language == "system") "" else language))
     }
 
     companion object {

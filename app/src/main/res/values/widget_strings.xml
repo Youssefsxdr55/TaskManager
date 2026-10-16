@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_today_title">Today</string>
+    <string name="widget_today_empty">No tasks due today</string>
+    <string name="widget_today_description">Tasks due today</string>
+    <string name="widget_focus_title">Pomodoro</string>
+    <string name="widget_focus_idle">Timer is not running</string>
+    <string name="widget_focus_end">Ends at %1$s</string>
+    <string name="widget_focus_description">Focus timer status and end time</string>
+    <string name="widget_open_timer">Tap to open timer</string>
+</resources>

@@ -38,6 +38,9 @@ import com.joe.taskmanager.ui.screens.today.TodayViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodayScreen(
+    onOpenDrawer: () -> Unit,
+    onOpenToday: () -> Unit,
+    onOpenUpcoming: () -> Unit,
     onAddTask: () -> Unit,
     onTaskClick: (Long) -> Unit,
     onSeeOverdue: () -> Unit,
@@ -53,6 +56,10 @@ fun TodayScreen(
     ScreenScaffold(
         title = stringResource(R.string.nav_today),
         snackbarHostState = viewModel.snackbarHostState,
+        bottomBar = { MainBottomBar(true, onOpenToday, onOpenUpcoming) },
+        topBarActions = { IconButton(onClick = onOpenDrawer) {
+            Text("☰", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+        } },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddTask) {
                 Icon(
@@ -63,7 +70,7 @@ fun TodayScreen(
         }
     ) { padding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().then(padding),
             contentPadding = PaddingValues(bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
@@ -79,10 +86,7 @@ fun TodayScreen(
                         )
                     }
                     IconButton(onClick = onOpenSettings) {
-                        Icon(
-                            androidx.compose.material.icons.Icons.Filled.Settings,
-                            contentDescription = stringResource(R.string.nav_settings)
-                        )
+                        Text("⚙", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
                     }
                 }
             }
@@ -135,7 +139,8 @@ fun TodayScreen(
                             )
                         }
                     },
-                    onClick = { onTaskClick(task.id) }
+                    onClick = { onTaskClick(task.id) },
+                    onSnooze = { viewModel.snooze(task.id, it) }
                 )
             }
         }

@@ -3,6 +3,8 @@ package com.joe.taskmanager.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +41,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.joe.taskmanager.R
+import com.joe.taskmanager.ui.components.SnoozeChoice
 import com.joe.taskmanager.data.local.entity.Priority
 import com.joe.taskmanager.data.local.entity.Task
 import com.joe.taskmanager.data.local.entity.TaskStatus
@@ -52,8 +60,11 @@ fun TaskRow(
     onToggleComplete: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showListName: String? = null
+    showListName: String? = null,
+    onSnooze: (SnoozeChoice) -> Unit = {}
 ) {
+    var showSnooze by remember(task.id) { mutableStateOf(false) }
+    var horizontalDrag by remember(task.id) { mutableFloatStateOf(0f) }
     val completed = task.status == TaskStatus.COMPLETED
     // PRD 8: overdue red is only for genuinely overdue, still-open tasks.
     val titleColor = when {
@@ -65,6 +76,24 @@ fun TaskRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .pointerInput(task.id, completed) {
+                val swipeThreshold = 72.dp.toPx()
+                val consumeThreshold = 24.dp.toPx()
+                detectHorizontalDragGestures(
+                    onHorizontalDrag = { change, amount ->
+                        horizontalDrag += amount
+                        if (kotlin.math.abs(horizontalDrag) > consumeThreshold) change.consume()
+                    },
+                    onDragEnd = {
+                        when {
+                            horizontalDrag > swipeThreshold && !completed -> onToggleComplete()
+                            horizontalDrag < -swipeThreshold && !completed -> showSnooze = true
+                        }
+                        horizontalDrag = 0f
+                    },
+                    onDragCancel = { horizontalDrag = 0f }
+                )
+            }
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.Top
@@ -138,6 +167,16 @@ fun TaskRow(
                 )
             }
         }
+    }
+
+    if (showSnooze) {
+        SnoozeSheet(
+            onDismiss = { showSnooze = false },
+            onPick = { choice ->
+                showSnooze = false
+                onSnooze(choice)
+            }
+        )
     }
 }
 

@@ -1,6 +1,10 @@
 
 package com.joe.taskmanager.ui.components
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import java.util.Calendar
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.joe.taskmanager.R
 import com.joe.taskmanager.util.DateUtils
@@ -35,6 +40,7 @@ fun SnoozeSheet(
     onDismiss: () -> Unit,
     onPick: (SnoozeChoice) -> Unit
 ) {
+    val context = LocalContext.current
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)) {
             SheetRow(stringResource(R.string.action_snooze_later_today)) { onPick(SnoozeChoice.LATER_TODAY) }
@@ -42,13 +48,29 @@ fun SnoozeSheet(
             SheetRow(stringResource(R.string.action_snooze_next_week)) { onPick(SnoozeChoice.NEXT_WEEK) }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             SheetRow(stringResource(R.string.action_snooze_pick)) {
-                val tomorrow = DateUtils.plusDays(System.currentTimeMillis(), 1)
-                onPick(
-                    SnoozeChoice.Custom(
-                        dayStart = DateUtils.startOfDay(tomorrow),
-                        hour = 9, minute = 0
-                    )
-                )
+                val today = Calendar.getInstance()
+                DatePickerDialog(
+                    context,
+                    { _, year, month, day ->
+                        val chosen = Calendar.getInstance().apply {
+                            set(year, month, day, 0, 0, 0)
+                            set(Calendar.MILLISECOND, 0)
+                        }
+                        TimePickerDialog(
+                            context,
+                            { _, hour, minute ->
+                                onPick(SnoozeChoice.Custom(
+                                    dayStart = chosen.timeInMillis,
+                                    hour = hour,
+                                    minute = minute
+                                ))
+                            }, 9, 0, false
+                        ).show()
+                    },
+                    today.get(Calendar.YEAR),
+                    today.get(Calendar.MONTH),
+                    today.get(Calendar.DAY_OF_MONTH)
+                ).show()
             }
         }
     }

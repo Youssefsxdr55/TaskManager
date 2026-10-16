@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -46,6 +47,8 @@ class SearchIndexMaintainer @Inject constructor(
      * rapid editing does not queue many rebuilds.
      */
     fun observeAndMaintain(scope: CoroutineScope) {
-        changeSignal.collectLatest { rebuildAll() }
+        scope.launch {
+            changeSignal.collectLatest { rebuildAll() }
+        }
     }
 }

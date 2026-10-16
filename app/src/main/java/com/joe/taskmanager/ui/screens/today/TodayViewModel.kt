@@ -7,6 +7,8 @@ import com.joe.taskmanager.data.local.dao.TaskListDao
 import com.joe.taskmanager.data.local.entity.Task
 import com.joe.taskmanager.data.local.entity.TaskStatus
 import com.joe.taskmanager.data.repository.TaskRepository
+import com.joe.taskmanager.ui.components.SnoozeChoice
+import com.joe.taskmanager.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -85,4 +87,20 @@ class TodayViewModel @Inject constructor(
             pendingUndoTaskId = null
         }
     }
+    fun snooze(taskId: Long, choice: SnoozeChoice) {
+        viewModelScope.launch {
+            val task = repository.getTask(taskId) ?: return@launch
+            val now = System.currentTimeMillis()
+            val newDue = when (choice) {
+                SnoozeChoice.LATER_TODAY -> if ((task.dueDate ?: 0L) < DateUtils.endOfToday())
+                    DateUtils.combine(DateUtils.startOfToday(), 18, 0)
+                else DateUtils.combine(DateUtils.plusDays(now, 1), 9, 0)
+                SnoozeChoice.TOMORROW -> DateUtils.combine(DateUtils.plusDays(now, 1), 9, 0)
+                SnoozeChoice.NEXT_WEEK -> DateUtils.combine(DateUtils.plusDays(now, 7), 9, 0)
+                is SnoozeChoice.Custom -> DateUtils.combine(choice.dayStart, choice.hour, choice.minute)
+            }
+            repository.postpone(taskId, newDue, hasTime = true, source = "swipe")
+        }
+    }
+
 }

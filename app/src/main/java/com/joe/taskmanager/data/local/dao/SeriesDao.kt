@@ -23,6 +23,8 @@ interface SeriesDao {
     suspend fun markOccurrence(marker: OccurrenceMarker): Long
     @Query("SELECT COUNT(*) FROM occurrence_markers WHERE seriesId = :seriesId AND occurrenceDate = :date")
     suspend fun occurrenceExists(seriesId: Long, date: Long): Int
+    @Query("DELETE FROM occurrence_markers WHERE seriesId = :seriesId AND occurrenceDate >= :fromDate")
+    suspend fun clearMarkersFrom(seriesId: Long, fromDate: Long)
     @Query("SELECT * FROM occurrence_markers WHERE seriesId = :seriesId ORDER BY occurrenceDate ASC")
     fun observeMarkers(seriesId: Long): Flow<List<OccurrenceMarker>>
 }

@@ -11,7 +11,7 @@ package com.joe.taskmanager.data.local
  */
 object SearchQueryBuilder {
 
-    private val FTS_SPECIAL = charArrayOf('"', '\'', '*', '(', ')', ':', '-', '+', '^', '.', ',', '!', '?')
+    private val FTS_SPECIAL = charArrayOf('"', '\'', '\\', '*', '(', ')', ':', '-', '+', '^', '.', ',', '!', '?')
 
     fun build(raw: String): String {
         if (raw.isBlank()) return ""

@@ -40,13 +40,13 @@ fun TrashScreen(
             EmptyState(
                 title = stringResource(R.string.empty_trash_title),
                 body = stringResource(R.string.trash_retention),
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.then(padding)
             )
             return@ScreenScaffold
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().then(padding),
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
             items(tasks, key = { it.id }) { task ->

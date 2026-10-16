@@ -16,6 +16,8 @@ interface FocusDao {
     fun observeMinutesBetween(from: Long, to: Long): Flow<Int>
     @Query("SELECT COUNT(*) FROM focus_sessions WHERE status = 'COMPLETED' AND startedAt BETWEEN :from AND :to")
     suspend fun completedCountBetween(from: Long, to: Long): Int
+    @Query("SELECT COALESCE(SUM(actualMinutes), 0) FROM focus_sessions WHERE status = 'COMPLETED'")
+    suspend fun lifetimeCompletedMinutes(): Int
     @Query("SELECT * FROM focus_sessions WHERE taskId = :taskId ORDER BY startedAt DESC")
     fun observeForTask(taskId: Long): Flow<List<FocusSession>>
 }

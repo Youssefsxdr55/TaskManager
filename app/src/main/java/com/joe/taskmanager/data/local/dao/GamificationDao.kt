@@ -59,6 +59,9 @@ interface GamificationDao {
     )
     suspend fun focusCountBetween(from: Long, to: Long): Int
 
+    @Query("SELECT COUNT(*) FROM points_ledger WHERE entityType = 'task' AND delta > 0")
+    suspend fun taskCompletionAwardCount(): Int
+
     // ---------- Rewards ----------
 
     @Insert suspend fun insertReward(reward: Reward): Long

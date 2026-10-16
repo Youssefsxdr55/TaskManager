@@ -1,6 +1,8 @@
 
 package com.joe.taskmanager.data.repository
-
+import androidx.room.withTransaction
+import com.joe.taskmanager.data.local.AppDatabase
+import com.joe.taskmanager.data.gamification.PointsEngine
 import com.joe.taskmanager.data.local.dao.EventDao
 import com.joe.taskmanager.data.local.dao.ReminderDao
 import com.joe.taskmanager.data.local.dao.SubtaskDao
@@ -19,10 +21,10 @@ import com.joe.taskmanager.data.local.entity.TaskStatus
 import com.joe.taskmanager.data.local.entity.TaskTag
 import com.joe.taskmanager.notification.ReminderScheduler
 import com.joe.taskmanager.util.ReminderMath
+import com.joe.taskmanager.widget.TaskWidgetUpdater
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
-
 /**
  * Single write path for tasks (PRD 4.1 MVVM + repository + unidirectional flow).
  *
@@ -39,10 +41,12 @@ class TaskRepository @Inject constructor(
     private val reminderDao: ReminderDao,
     private val eventDao: EventDao,
     private val eventLogger: EventLogger,
-    private val scheduler: ReminderScheduler
+    private val scheduler: ReminderScheduler,
+    private val pointsEngine: PointsEngine,
+    private val database: AppDatabase,
+    private val widgetUpdater: TaskWidgetUpdater
 ) {
     // ---------- Reads ----------
-
     fun observeTask(id: Long): Flow<Task?> = taskDao.observeById(id)
     fun observeDueToday(): Flow<List<Task>> =
         taskDao.observeDueToday(com.joe.taskmanager.util.DateUtils.startOfToday(), com.joe.taskmanager.util.DateUtils.endOfToday())
@@ -53,6 +57,7 @@ class TaskRepository @Inject constructor(
     fun observeUpcoming(): Flow<List<Task>> =
         taskDao.observeUpcoming(com.joe.taskmanager.util.DateUtils.endOfToday())
     fun observeAllOpen(): Flow<List<Task>> = taskDao.observeAllOpen()
+    fun observeInboxOpen(): Flow<List<Task>> = taskDao.observeInboxOpen()
     fun observeCompleted(): Flow<List<Task>> = taskDao.observeCompleted()
     fun observeTrash(): Flow<List<Task>> = taskDao.observeTrash()
     fun observeByList(listId: Long): Flow<List<Task>> = taskDao.observeByList(listId)
@@ -61,15 +66,20 @@ class TaskRepository @Inject constructor(
     fun observeTagsForTask(taskId: Long): Flow<List<Tag>> = tagDao.observeForTask(taskId)
     fun observeReminders(taskId: Long): Flow<List<Reminder>> = reminderDao.observeForTask(taskId)
     fun observeOpenCount(): Flow<Int> = taskDao.observeOpenCount()
-
     fun observeFiltered(
         listId: Long?, priority: Priority?, dueFrom: Long?, dueTo: Long?, sort: String
     ): Flow<List<Task>> = taskDao.observeFiltered(listId, priority, dueFrom, dueTo, sort)
-
     suspend fun getTask(id: Long): Task? = taskDao.getById(id)
 
+    /** Preserves tasks in Inbox or moves them to Trash before their lists are deleted. */
+    suspend fun clearListContents(listIds: List<Long>, deleteTasks: Boolean) {
+        if (listIds.isEmpty()) return
+        taskDao.allForLists(listIds).forEach { task ->
+            if (deleteTasks) moveToTrash(task.id)
+            else updateTask(task.id, clearList = true)
+        }
+    }
     // ---------- Create ----------
-
     /**
      * Fast capture (PRD 1.3 principle 1): a title-only task is saved in under
      * 5 seconds, so this path does no extra queries when everything is optional.
@@ -86,7 +96,6 @@ class TaskRepository @Inject constructor(
         reminders: List<NewReminder> = emptyList()
     ): Long {
         require(title.isNotBlank()) { "Task title cannot be blank" }
-
         val now = System.currentTimeMillis()
         val id = taskDao.insert(
             Task(
@@ -100,7 +109,6 @@ class TaskRepository @Inject constructor(
                 updatedAt = now
             )
         )
-
         tags.forEach { tagId -> tagDao.upsertLink(TaskTag(taskId = id, tagId = tagId)) }
         subtasks.forEachIndexed { index, subTitle ->
             subtaskDao.insert(Subtask(taskId = id, title = subTitle, sortOrder = index))
@@ -108,16 +116,14 @@ class TaskRepository @Inject constructor(
         reminders.forEach { new ->
             addReminderInternal(id, new, dueDate, hasTime)
         }
-
         eventLogger.log(
             EventType.TASK_CREATED, "task", id,
             mapOf("hasDue" to (dueDate != null), "hasTime" to hasTime, "priority" to priority.name)
         )
+        widgetUpdater.updateToday()
         return id
     }
-
     // ---------- Update ----------
-
     suspend fun updateTask(
         id: Long,
         title: String? = null,
@@ -133,7 +139,6 @@ class TaskRepository @Inject constructor(
         val newDue = if (clearDue) null else (dueDate ?: existing.dueDate)
         val newHasTime = hasTime ?: existing.hasTime
         val now = System.currentTimeMillis()
-
         taskDao.update(
             existing.copy(
                 title = title?.trim() ?: existing.title,
@@ -145,39 +150,39 @@ class TaskRepository @Inject constructor(
                 updatedAt = now
             )
         )
-
         // Due-date or time changes invalidate every booked alarm.
         rescheduleReminders(id)
         eventLogger.log(EventType.TASK_EDITED, "task", id, mapOf("dueChanged" to (newDue != existing.dueDate)))
+        widgetUpdater.updateToday()
     }
-
     /**
      * PRD 7.1: "Points are awarded once per task" is enforced in the gamification
      * layer via a dedupe key; this method only flips status and logs the event, so
      * un-completing does not remove previously awarded points.
      */
     suspend fun setCompleted(id: Long, completed: Boolean) {
-        val existing = taskDao.getById(id) ?: return
-        if (existing.status == (if (completed) TaskStatus.COMPLETED else TaskStatus.OPEN)) return
-
-        val now = System.currentTimeMillis()
-        taskDao.setStatus(
-            id = id,
-            status = if (completed) TaskStatus.COMPLETED else TaskStatus.OPEN,
-            completedAt = if (completed) now else null,
-            now = now
-        )
-
-        eventLogger.log(
-            if (completed) EventType.TASK_COMPLETED else EventType.TASK_UNCOMPLETED,
-            "task", id, mapOf("priority" to existing.priority.name)
-        )
-
-        if (completed) cancelReminders(id)
+        val changed = database.withTransaction {
+            val existing = taskDao.getById(id) ?: return@withTransaction false
+            if (existing.status == (if (completed) TaskStatus.COMPLETED else TaskStatus.OPEN)) return@withTransaction false
+            val now = System.currentTimeMillis()
+            taskDao.setStatus(
+                id = id,
+                status = if (completed) TaskStatus.COMPLETED else TaskStatus.OPEN,
+                completedAt = if (completed) now else null,
+                now = now
+            )
+            eventLogger.log(
+                if (completed) EventType.TASK_COMPLETED else EventType.TASK_UNCOMPLETED,
+                "task", id, mapOf("priority" to existing.priority.name)
+            )
+            if (completed) pointsEngine.awardTaskCompletion(id, existing.priority, existing.occurrenceDate)
+            true
+        }
+        if (changed && completed) cancelReminders(id)
+        if (changed) widgetUpdater.updateToday()
     }
 
     // ---------- Postpone / snooze ----------
-
     /**
      * Swipe-left snooze (PRD 7.1) and the notification Snooze action share this.
      * Records TASK_POSTPONED so postponement analytics work without extra columns.
@@ -185,69 +190,79 @@ class TaskRepository @Inject constructor(
     suspend fun postpone(id: Long, newDueDate: Long, hasTime: Boolean, source: String) {
         val existing = taskDao.getById(id) ?: return
         taskDao.setDue(id, newDueDate, hasTime, System.currentTimeMillis())
-
         eventLogger.log(
             EventType.TASK_POSTPONED, "task", id,
             mapOf("source" to source, "from" to existing.dueDate, "to" to newDueDate)
         )
         rescheduleReminders(id)
+        widgetUpdater.updateToday()
     }
-
     suspend fun postponeByOffset(id: Long, minutes: Int, source: String) {
         val existing = taskDao.getById(id) ?: return
         val base = existing.dueDate ?: System.currentTimeMillis()
         postpone(id, ReminderMath.addMinutes(base, minutes), hasTime = true, source = source)
     }
-
     // ---------- Soft delete / trash (PRD OQ-8) ----------
-
     suspend fun moveToTrash(id: Long) {
         taskDao.setDeletedAt(id, System.currentTimeMillis(), System.currentTimeMillis())
         cancelReminders(id)
         eventLogger.log(EventType.TASK_DELETED, "task", id)
+        widgetUpdater.updateToday()
     }
-
     suspend fun restoreFromTrash(id: Long) {
         taskDao.setDeletedAt(id, null, System.currentTimeMillis())
         rescheduleReminders(id)
+        widgetUpdater.updateToday()
     }
-
     suspend fun purgeTrashOlderThan(cutoff: Long): Int = taskDao.purgeTrash(cutoff)
-
     // ---------- Subtasks ----------
-
     suspend fun addSubtask(taskId: Long, title: String) {
         val order = subtaskDao.forTask(taskId).size
         subtaskDao.insert(Subtask(taskId = taskId, title = title.trim(), sortOrder = order))
     }
-
     suspend fun setSubtaskDone(id: Long, done: Boolean) = subtaskDao.setDone(id, done)
-
     suspend fun deleteSubtask(subtask: Subtask) = subtaskDao.delete(subtask)
-
     suspend fun reorderSubtasks(ordered: List<Subtask>) {
         ordered.forEachIndexed { index, sub -> subtaskDao.update(sub.copy(sortOrder = index)) }
     }
-
+    suspend fun replaceSubtasks(taskId: Long, titles: List<String>) {
+        val existing = subtaskDao.forTask(taskId)
+        val used = mutableSetOf<Int>()
+        titles.map { it.trim() }.filter { it.isNotEmpty() }.forEachIndexed { order, title ->
+            val match = existing.indices.firstOrNull { it !in used && existing[it].title == title }
+            if (match != null) {
+                used += match
+                subtaskDao.update(existing[match].copy(sortOrder = order))
+            } else {
+                subtaskDao.insert(Subtask(taskId = taskId, title = title, sortOrder = order))
+            }
+        }
+        existing.forEachIndexed { index, sub -> if (index !in used) subtaskDao.delete(sub) }
+    }
     // ---------- Tags ----------
-
     suspend fun createTag(name: String, color: Int): Long {
         val existing = tagDao.findByName(name.trim())
         if (existing != null) return existing.id
         return tagDao.insert(Tag(name = name.trim(), color = color))
     }
-
+    suspend fun replaceTaskTags(taskId: Long, tagIds: Set<Long>) {
+        tagDao.unlinkAll(taskId)
+        tagIds.forEach { tagDao.upsertLink(TaskTag(taskId = taskId, tagId = it)) }
+    }
     suspend fun attachTag(taskId: Long, tagId: Long) = tagDao.upsertLink(TaskTag(taskId, tagId))
     suspend fun detachTag(taskId: Long, tagId: Long) = tagDao.unlink(taskId, tagId)
     suspend fun deleteTag(tag: Tag) = tagDao.delete(tag)
-
     // ---------- Reminders ----------
-
+    suspend fun replaceReminders(taskId: Long, reminders: List<NewReminder>) {
+        val task = taskDao.getById(taskId) ?: return
+        cancelReminders(taskId)
+        reminderDao.deleteForTask(taskId)
+        reminders.forEach { addReminderInternal(taskId, it, task.dueDate, task.hasTime) }
+    }
     suspend fun addReminder(taskId: Long, reminder: NewReminder) {
         val task = taskDao.getById(taskId) ?: return
         addReminderInternal(taskId, reminder, task.dueDate, task.hasTime)
     }
-
     private suspend fun addReminderInternal(
         taskId: Long,
         new: NewReminder,
@@ -262,13 +277,11 @@ class TaskRepository @Inject constructor(
         )
         val scheduledAt = computeSchedule(row, dueDate, hasTime)
         if (scheduledAt == null) return  // PRD 7.3: invalid reminders are not stored.
-
         val id = reminderDao.insert(row.copy(scheduledAt = scheduledAt))
         if (scheduledAt > System.currentTimeMillis()) {
             scheduler.schedule(id, scheduledAt, isHighPriority = false)
         }
     }
-
     private fun computeSchedule(reminder: Reminder, dueDate: Long?, hasTime: Boolean): Long? =
         when (reminder.type) {
             ReminderType.ABSOLUTE -> reminder.absoluteTime
@@ -279,7 +292,6 @@ class TaskRepository @Inject constructor(
                 else ReminderMath.subtractMinutes(dueDate, offset)
             }
         }
-
     private suspend fun rescheduleReminders(taskId: Long) {
         val task = taskDao.getById(taskId) ?: return
         val highPriority = task.priority == Priority.HIGH
@@ -293,16 +305,13 @@ class TaskRepository @Inject constructor(
             }
         }
     }
-
     private suspend fun cancelReminders(taskId: Long) {
         reminderDao.forTask(taskId).forEach { scheduler.cancel(it.id) }
     }
-
     suspend fun deleteReminder(reminder: Reminder) {
         reminderDao.delete(reminder)
         scheduler.cancel(reminder.id)
     }
-
     /** PRD 6.2: Folder > List > Sublist, three levels maximum. */
     suspend fun validateListDepth(parentListId: Long?): Boolean {
         if (parentListId == null) return true
@@ -310,7 +319,6 @@ class TaskRepository @Inject constructor(
         // A sublist cannot itself contain sublists.
         return parent.parentListId == null
     }
-
     data class NewReminder(
         val type: ReminderType,
         val offsetMinutes: Int? = null,

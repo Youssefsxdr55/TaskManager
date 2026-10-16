@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.joe.taskmanager.R
 import com.joe.taskmanager.data.settings.SettingsRepository
+import com.joe.taskmanager.data.gamification.PointsEngine
+import com.joe.taskmanager.notification.HabitReminderScheduler
 import com.joe.taskmanager.data.settings.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,12 +20,16 @@ data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val themeLabelRes: Int = R.string.theme_system,
     val language: String = "system",
-    val snoozeMinutes: Int = 10
+    val snoozeMinutes: Int = 10,
+    val postponeThreshold: Int = 3,
+    val habitReminderHour: Int = 21
 )
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val repository: SettingsRepository
+    private val repository: SettingsRepository,
+    private val pointsEngine: PointsEngine,
+    private val habitReminderScheduler: HabitReminderScheduler
 ) : ViewModel() {
 
     val uiState: StateFlow<SettingsUiState> = repository.settings
@@ -36,7 +42,9 @@ class SettingsViewModel @Inject constructor(
                     ThemeMode.DARK -> R.string.theme_dark
                 },
                 language = s.language,
-                snoozeMinutes = s.defaultSnoozeMinutes
+                snoozeMinutes = s.defaultSnoozeMinutes,
+                postponeThreshold = s.postponeAlertThreshold,
+                habitReminderHour = s.habitReminderHour
             )
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
@@ -63,6 +71,18 @@ class SettingsViewModel @Inject constructor(
         }
         viewModelScope.launch { repository.setLanguage(next) }
     }
+
+    fun cycleHabitReminderTime() {
+        val next = when (uiState.value.habitReminderHour) { 18 -> 19; 19 -> 20; 20 -> 21; 21 -> 22; 22 -> 23; else -> 18 }
+        viewModelScope.launch { repository.setHabitReminderTime(next, 0); habitReminderScheduler.scheduleNext() }
+    }
+
+    fun cyclePostponeThreshold() {
+        val next = when (uiState.value.postponeThreshold) { 2 -> 3; 3 -> 5; 5 -> 10; else -> 2 }
+        viewModelScope.launch { repository.setPostponeAlertThreshold(next) }
+    }
+
+    fun resetPoints() { viewModelScope.launch { pointsEngine.resetPoints() } }
 
     fun cycleSnooze() {
         val next = when (uiState.value.snoozeMinutes) {

@@ -36,3 +36,11 @@ desktop.ini
 # Local CI debug output
 ci-error.log
 
+
+# Android module build and Kotlin compiler outputs
+/app/build/
+/.kotlin/
+
+# Temporary signing files created by the tagged-release CI job
+/release-upload.jks
+

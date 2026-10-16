@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_today_title">اليوم</string>
+    <string name="widget_today_empty">لا توجد مهام مستحقة اليوم</string>
+    <string name="widget_today_description">المهام المستحقة اليوم</string>
+    <string name="widget_focus_title">بومودورو</string>
+    <string name="widget_focus_idle">المؤقت غير مشغّل</string>
+    <string name="widget_focus_end">ينتهي الساعة %1$s</string>
+    <string name="widget_focus_description">حالة مؤقت التركيز ووقت انتهائه</string>
+    <string name="widget_open_timer">اضغط لفتح المؤقت</string>
+</resources>

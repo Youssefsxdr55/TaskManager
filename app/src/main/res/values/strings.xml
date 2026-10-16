@@ -46,6 +46,7 @@
     <string name="task_subtasks">Subtasks</string>
     <string name="task_subtask_hint">Add a subtask</string>
     <string name="chip_date">Date</string>
+    <string name="chip_time">Time</string>
     <string name="chip_priority">Priority</string>
     <string name="chip_list">List</string>
     <string name="chip_tags">Tags</string>
@@ -79,6 +80,7 @@
     <!-- Reminders -->
     <string name="reminder_at_due">At due time</string>
     <string name="reminder_before">Before</string>
+    <string name="reminder_before_minutes">%1$d min before</string>
     <string name="reminder_absolute">Custom time</string>
     <string name="reminder_none">No reminder</string>
 
@@ -149,4 +151,84 @@
     <string name="task_deleted">Task deleted</string>
     <string name="task_completed">Task completed</string>
     <string name="task_postponed">Task postponed</string>
+    <string name="tag_add">Add tag</string>
+    <string name="tag_edit_title">Edit tag</string>
+    <string name="tag_edit">Edit %1$s</string>
+    <string name="tag_name">Name</string>
+    <string name="tag_color">Color</string>
+    <string name="tags_empty">No tags yet</string>
+    <string name="color_brown">Brown</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_green">Green</string>
+    <string name="color_purple">Purple</string>
+    <string name="color_red">Red</string>
+    <string name="tag_delete_title">Delete tag?</string>
+    <string name="tag_delete_confirm">Tasks will lose the %1$s tag.</string>
+    <string name="nav_organization">Folders and lists</string>
+    <string name="organization_add_folder">Add folder</string>
+    <string name="organization_add_list">Add list</string>
+    <string name="organization_add_sublist">Add sublist</string>
+    <string name="organization_name">Name</string>
+    <string name="organization_empty">No folders or lists yet</string>
+    <string name="onboarding_permissions_title">Set up reliable reminders</string>
+    <string name="onboarding_permissions_body">These optional settings help reminders arrive on time. You can change them later in Settings.</string>
+    <string name="onboarding_open_settings">Review permissions</string>
+    <string name="action_back">Back</string>
+    <string name="filter_any">Any</string>
+    <string name="filter_list">List</string>
+    <string name="filter_tag">Tag</string>
+    <string name="filter_priority">Priority</string>
+    <string name="filter_status">Status</string>
+    <string name="filter_date">Date</string>
+    <string name="filter_open">Open</string>
+    <string name="filter_completed">Completed</string>
+    <string name="filter_today">Today</string>
+    <string name="filter_next_7_days">Next 7 days</string>
+    <string name="filter_overdue">Overdue</string>
+    <string name="chip_reminder_count">Reminders (%1$d)</string>
+    <string name="reminder_before_hour">1 hour before</string>
+    <string name="reminder_before_day">1 day before</string>
+    <string name="organization_delete_title">Delete %1$s?</string>
+    <string name="organization_delete_body">Choose what to do with its tasks and sublists.</string>
+    <string name="organization_move_to_inbox">Move tasks to Inbox</string>
+    <string name="organization_delete_tasks">Move tasks to Trash</string>
+    <string name="nav_habits">Habits</string><string name="habit_add">Add habit</string><string name="habit_name">Habit name</string><string name="habit_numeric">Track a numeric target</string><string name="habit_target">Daily target</string><string name="habit_unit">Unit (optional)</string><string name="habits_empty">No habits yet. Add one to start tracking.</string><string name="habit_points">Points: %1$d</string><string name="habit_streak">Current streak: %1$d days</string><string name="habit_done_today">Completed today</string><string name="habit_mark_done">Mark today complete</string><string name="habit_progress">Value today</string><string name="action_archive">Archive</string>
+    <string name="nav_rewards">Rewards</string><string name="reward_add">Add reward</string><string name="reward_edit">Edit reward</string><string name="reward_name">Reward name</string><string name="reward_emoji">Emoji (optional)</string><string name="reward_cost_label">Point cost</string><string name="reward_note">Note (optional)</string><string name="reward_balance">Balance: %1$d points</string><string name="reward_lifetime">Lifetime earned: %1$d points</string><string name="reward_cost">Cost: %1$d points</string><string name="reward_redeem">Redeem</string><string name="rewards_empty">No rewards yet. Add a reward to save toward.</string><string name="reward_history">Redemption history</string><string name="reward_no_redemptions">No redemptions yet</string><string name="reward_history_entry">Redeemed reward for %1$d points</string><string name="action_edit">Edit</string>
+<string name="points_reset">Reset points</string><string name="points_reset_confirm">Your balance will return to zero. Your points history will stay available.</string>
+<string name="nav_recurrence">Recurring tasks</string><string name="recurrence_add">Add recurring task</string><string name="recurrence_empty">No recurring tasks yet</string><string name="recurrence_interval">Every interval</string><string name="recurrence_weekdays">Specific weekdays</string><string name="recurrence_monthly">Monthly by date</string><string name="recurrence_yearly">Yearly</string><string name="recurrence_every">Repeat every</string><string name="recurrence_day">Day of month (1–31)</string><string name="recurrence_year_day">Day of year (1–31)</string><string name="weekday_sat">Sa</string><string name="weekday_sun">Su</string><string name="weekday_mon">Mo</string><string name="weekday_tue">Tu</string><string name="weekday_wed">We</string><string name="weekday_thu">Th</string><string name="weekday_fri">Fr</string>
+<string name="habit_schedule">Scheduled days</string><string name="habit_threshold">Streak threshold (%)</string>
+<string name="habit_best_rate">Best: %1$d days · 30-day completion: %2$d%%</string>
+<string name="badges_title">Badges</string><string name="badge_first_task">First task completed</string><string name="badge_tasks_10">10 tasks completed</string><string name="badge_tasks_100">100 tasks completed</string><string name="badge_tasks_1000">1,000 tasks completed</string><string name="badge_habit_7">7-day habit streak</string><string name="badge_habit_30">30-day habit streak</string><string name="badge_generic">Achievement unlocked</string>
+<string name="reward_level">Level %1$d</string>
+<string name="month_jan">Jan</string><string name="month_feb">Feb</string><string name="month_mar">Mar</string><string name="month_apr">Apr</string><string name="month_may">May</string><string name="month_jun">Jun</string><string name="month_jul">Jul</string><string name="month_aug">Aug</string><string name="month_sep">Sep</string><string name="month_oct">Oct</string><string name="month_nov">Nov</string><string name="month_dec">Dec</string>
+<string name="nav_calendar">Calendar</string><string name="calendar_no_tasks">No tasks on this day</string>
+<string name="quick_add_parse">Parse date and time</string><string name="quick_add_review">Review and edit the title, date, and time before saving.</string>
+<string name="nav_insights">Insights</string><string name="insight_tasks">Tasks completed</string><string name="insight_focus">Focus time</string><string name="insight_habits">Habit adherence</string><string name="insight_points">Points</string><string name="insight_comparison">This week: %1$d%2$s · Previous week: %3$d%4$s</string><string name="minutes_short"> min</string><string name="insight_best_day">Best weekday: %1$s</string><string name="insight_postponed">Tasks postponed often</string><string name="insight_no_alerts">No postponement alerts</string><string name="insight_postponed_item">Postponed %1$d times. Tap to review.</string>
+<string name="settings_postpone_threshold">Postponement alert threshold</string>
+<string name="nav_focus">Focus timer</string><string name="focus_phase">Focus</string><string name="focus_break_phase">Break</string><string name="focus_phase_ready">Phase complete. Start the next phase when ready.</string><string name="focus_running">Timer is running</string><string name="focus_paused">Timer paused</string><string name="focus_start_next">Start next phase</string><string name="focus_resume">Resume</string><string name="focus_pause">Pause</string><string name="focus_stop">Stop</string><string name="focus_sessions_completed">Completed focus sessions: %1$d</string><string name="focus_minutes">Focus minutes</string><string name="focus_short_break">Short break</string><string name="focus_long_break">Long break</string><string name="focus_sessions_before_long">Sessions before long break</string><string name="focus_link_task">Link a task (optional)</string><string name="focus_no_task">No linked task</string><string name="focus_do_not_disturb">Mute notifications during focus</string><string name="focus_grant_dnd">Grant Do Not Disturb access</string><string name="focus_auto_start">Auto-start the next phase</string><string name="focus_start">Start focus session</string>
+<string name="habit_reminder_title">Habit reminder</string>
+<plurals name="habit_reminder_body"><item quantity="one">You have %1$d habit to check in.</item><item quantity="other">You have %1$d habits to check in.</item></plurals>
+<string name="settings_habit_reminder">Nightly habit reminder</string>
+<string name="habit_increase">Increase habit progress</string><string name="habit_decrease">Decrease habit progress</string>
+<string name="badge_focus_hour">First focus hour</string><string name="badge_focus_10_hours">10 focus hours</string>
+<string name="calendar_week_view">Week view</string><string name="calendar_month_view">Month view</string>
+<string name="calendar_no_habit_logs">No habit check-ins on this day</string>
+    <string name="insight_best_hour">Best completion hour: %1$02d:00</string>
+    <string name="insight_habit_heatmap">Habit completion · last 4 weeks</string>
+    <string name="badge_perfect_day">Perfect Day</string>
+    <string name="badge_comeback">Comeback after negative balance</string>
+    <string name="recurrence_stop">Stop series</string>
+    <string name="recurrence_stop_title">Stop recurring task?</string>
+    <string name="recurrence_stop_confirm">Future open occurrences of %1$s will move to Trash.</string>
+    <string name="recurrence_last_day">Last day of month</string>
+    <string name="recurrence_month">Month (1–12)</string>
+    <string name="recurrence_desc_interval">Every %1$d %2$s</string>
+    <string name="recurrence_unit_day">days</string>
+    <string name="recurrence_unit_week">weeks</string>
+    <string name="recurrence_unit_month">months</string>
+    <string name="recurrence_desc_weekdays">Selected weekdays</string>
+    <string name="recurrence_desc_last_day">Last day of each month</string>
+    <string name="recurrence_desc_month_day">Monthly on day %1$d</string>
+    <string name="recurrence_desc_yearly">Yearly on %1$d/%2$d</string>
+    <string name="recurrence_desc_default">Recurring</string>
 </resources>

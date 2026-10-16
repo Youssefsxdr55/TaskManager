@@ -14,6 +14,7 @@ import com.joe.taskmanager.data.local.dao.FolderDao
 import com.joe.taskmanager.data.local.dao.GamificationDao
 import com.joe.taskmanager.data.local.dao.HabitDao
 import com.joe.taskmanager.data.local.dao.ReminderDao
+import com.joe.taskmanager.data.local.dao.SearchableTaskDao
 import com.joe.taskmanager.data.local.dao.SearchIndexDao
 import com.joe.taskmanager.data.local.dao.TaskIndexQueriesDao
 import com.joe.taskmanager.data.local.dao.SeriesDao

@@ -17,14 +17,21 @@ data class BackupFile(
     val tags: List<TagDto> = emptyList(),
     val subtasks: List<SubtaskDto> = emptyList(),
     val reminders: List<ReminderDto> = emptyList(),
+    val taskTags: List<TaskTagDto> = emptyList(),
+    val taskSeries: List<TaskSeriesDto> = emptyList(),
+    val occurrenceMarkers: List<OccurrenceMarkerDto> = emptyList(),
+    val habits: List<HabitDto> = emptyList(),
+    val habitLogs: List<HabitLogDto> = emptyList(),
+    val focusSessions: List<FocusSessionDto> = emptyList(),
     val events: List<EventDto> = emptyList(),
     val ledger: List<LedgerDto> = emptyList(),
     val rewards: List<RewardDto> = emptyList(),
     val badges: List<BadgeDto> = emptyList(),
+    val redemptions: List<RedemptionDto> = emptyList(),
     val settings: Map<String, String> = emptyMap()
 ) {
     companion object {
-        const val CURRENT_SCHEMA_VERSION = 1
+        const val CURRENT_SCHEMA_VERSION = 2
     }
 }
 
@@ -60,6 +67,37 @@ data class TagDto(val id: Long, val name: String, val color: Int)
 data class ReminderDto(
     val id: Long, val taskId: Long, val type: String,
     val offsetMinutes: Int?, val absoluteTime: Long?, val scheduledAt: Long?
+)
+
+@Serializable data class TaskTagDto(val taskId: Long, val tagId: Long)
+
+@Serializable data class TaskSeriesDto(
+    val id: Long, val title: String, val notes: String, val listId: Long?, val priority: String,
+    val startDate: Long, val endDate: Long?, val intervalUnit: String?, val intervalAmount: Int,
+    val weekdaysMask: Int, val monthlyDayOfMonth: Int?, val monthlyIsLastDay: Boolean,
+    val yearlyMonth: Int?, val yearlyDayOfMonth: Int?, val hasTime: Boolean
+)
+
+@Serializable data class OccurrenceMarkerDto(val id: Long, val seriesId: Long, val occurrenceDate: Long)
+
+@Serializable data class HabitDto(
+    val id: Long, val name: String, val type: String, val targetValue: Double?, val unit: String?,
+    val minThresholdPercent: Int, val scheduleDays: Int, val reminderEnabled: Boolean,
+    val archived: Boolean, val createdAt: Long
+)
+
+@Serializable data class HabitLogDto(
+    val id: Long, val habitId: Long, val date: Long, val value: Double,
+    val completed: Boolean, val countsForStreak: Boolean, val freezeUsed: Boolean
+)
+
+@Serializable data class FocusSessionDto(
+    val id: Long, val taskId: Long?, val startedAt: Long, val plannedMinutes: Int,
+    val actualMinutes: Int, val status: String
+)
+
+@Serializable data class RedemptionDto(
+    val id: Long, val rewardId: Long, val cost: Int, val redeemedAt: Long, val ledgerId: Long?
 )
 
 @Serializable

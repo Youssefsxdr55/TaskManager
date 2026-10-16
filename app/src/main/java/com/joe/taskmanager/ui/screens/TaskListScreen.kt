@@ -2,6 +2,7 @@
 package com.joe.taskmanager.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,8 +15,13 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -40,6 +46,7 @@ fun TaskListScreen(
     viewModel: GenericTaskListViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var showSortMenu by remember { mutableStateOf(false) }
 
     ScreenScaffold(
         title = title ?: stringResource(R.string.nav_all_tasks),
@@ -53,13 +60,34 @@ fun TaskListScreen(
         if (state.tasks.isEmpty()) {
             EmptyState(
                 title = stringResource(state.emptyTextRes),
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.then(padding)
             )
             return@ScreenScaffold
         }
 
+        Column(modifier = Modifier.fillMaxSize().then(padding)) {
+        if (title == null && listId == null && tagId == null) {
+            androidx.compose.foundation.layout.Box {
+                TextButton(onClick = { showSortMenu = true }) {
+                    Text("${stringResource(R.string.filter_sort)}: ${stringResource(when (state.sortMode) {
+                        "PRIORITY" -> R.string.sort_priority
+                        "CREATED" -> R.string.sort_created
+                        "MANUAL" -> R.string.sort_manual
+                        else -> R.string.sort_due
+                    })}")
+                }
+                DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
+                    listOf("DUE" to R.string.sort_due, "PRIORITY" to R.string.sort_priority,
+                        "CREATED" to R.string.sort_created, "MANUAL" to R.string.sort_manual).forEach { (mode, label) ->
+                        DropdownMenuItem(text = { Text(stringResource(label)) }, onClick = {
+                            viewModel.setSortMode(mode); showSortMenu = false
+                        })
+                    }
+                }
+            }
+        }
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().weight(1f),
             contentPadding = PaddingValues(bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
@@ -68,9 +96,11 @@ fun TaskListScreen(
                     task = task,
                     onToggleComplete = { viewModel.toggleComplete(task.id) },
                     onClick = { onTaskClick(task.id) },
-                    modifier = if (tagId != null) Modifier else Modifier
+                    modifier = if (tagId != null) Modifier else Modifier,
+                    onSnooze = { viewModel.snooze(task.id, it) }
                 )
             }
+        }
         }
     }
 }

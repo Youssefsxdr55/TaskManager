@@ -15,6 +15,9 @@ interface HabitDao {
     @Insert suspend fun insert(habit: Habit): Long
     @Update suspend fun update(habit: Habit)
     @Query("SELECT * FROM habits WHERE archived = 0 ORDER BY createdAt ASC")
+    suspend fun activeHabits(): List<Habit>
+
+    @Query("SELECT * FROM habits WHERE archived = 0 ORDER BY createdAt ASC")
     fun observeActive(): Flow<List<Habit>>
     @Query("SELECT * FROM habits WHERE id = :id")
     suspend fun habitById(id: Long): Habit?
@@ -39,6 +42,9 @@ interface HabitDao {
 
     @Query("SELECT * FROM habit_logs WHERE habitId = :habitId AND date BETWEEN :from AND :to ORDER BY date ASC")
     suspend fun logsBetween(habitId: Long, from: Long, to: Long): List<HabitLog>
+
+    @Query("SELECT * FROM habit_logs WHERE date BETWEEN :from AND :to ORDER BY date ASC")
+    fun observeAllLogsBetween(from: Long, to: Long): Flow<List<HabitLog>>
 
     @Query("SELECT * FROM habit_logs WHERE date = :date")
     suspend fun logsOn(date: Long): List<HabitLog>

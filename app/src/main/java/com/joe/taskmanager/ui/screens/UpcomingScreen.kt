@@ -10,8 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,23 +33,40 @@ import com.joe.taskmanager.ui.screens.upcoming.UpcomingViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpcomingScreen(
+    onOpenDrawer: () -> Unit,
+    onOpenToday: () -> Unit,
+    onOpenUpcoming: () -> Unit,
     onTaskClick: (Long) -> Unit,
     onAddTask: () -> Unit,
     viewModel: UpcomingViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val completedMessage = stringResource(R.string.task_completed)
+    val undoLabel = stringResource(R.string.action_undo)
 
-    ScreenScaffold(title = stringResource(R.string.nav_upcoming)) { padding ->
+    ScreenScaffold(
+        title = stringResource(R.string.nav_upcoming),
+        snackbarHostState = viewModel.snackbarHostState,
+        bottomBar = { MainBottomBar(false, onOpenToday, onOpenUpcoming) },
+        topBarActions = { IconButton(onClick = onOpenDrawer) {
+            Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.nav_tasks))
+        } },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddTask) {
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_add_task))
+            }
+        }
+    ) { padding ->
         if (state.groups.isEmpty()) {
             EmptyState(
                 title = stringResource(R.string.empty_upcoming_title),
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.then(padding)
             )
             return@ScreenScaffold
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().then(padding),
             contentPadding = PaddingValues(bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
@@ -70,8 +93,13 @@ fun UpcomingScreen(
                 items(group.tasks, key = { it.id }) { task ->
                     TaskRow(
                         task = task,
-                        onToggleComplete = { viewModel.toggleComplete(task.id, task.status) },
-                        onClick = { onTaskClick(task.id) }
+                        onToggleComplete = {
+                            val completing = task.status == com.joe.taskmanager.data.local.entity.TaskStatus.OPEN
+                            viewModel.toggleComplete(task.id, task.status)
+                            if (completing) viewModel.showUndoSnackbar(task.id, completedMessage, undoLabel)
+                        },
+                        onClick = { onTaskClick(task.id) },
+                        onSnooze = { viewModel.snooze(task.id, it) }
                     )
                 }
             }

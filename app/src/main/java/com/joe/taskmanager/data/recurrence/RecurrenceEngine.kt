@@ -54,8 +54,8 @@ object RecurrenceEngine {
     }
 
     /** The next occurrence strictly after [current]. */
-    fun nextOccurrence(rule: RecurrenceRule, current: Long): Long =
-        when (rule) {
+    fun nextOccurrence(rule: RecurrenceRule, current: Long): Long {
+        return when (rule) {
             is RecurrenceRule.Interval -> addInterval(rule, current)
             is RecurrenceRule.Weekdays -> {
                 // Step one day at a time until a scheduled weekday appears. Seven
@@ -92,15 +92,16 @@ object RecurrenceEngine {
                 }
             }
             is RecurrenceRule.Yearly ->
-                clampDate(current, rule.month, rule.dayOfMonth)
+                yearlyDateOnOrAfter(DateUtils.plusDays(current, 1), rule.month, rule.dayOfMonth)
         }
+    }
 
     /**
      * Align the series start onto the rule. For weekday rules the first
      * occurrence is the first scheduled weekday on or after the start date.
      */
-    fun alignToRule(rule: RecurrenceRule, startDate: Long): Long =
-        when (rule) {
+    fun alignToRule(rule: RecurrenceRule, startDate: Long): Long {
+        return when (rule) {
             is RecurrenceRule.Weekdays -> {
                 var probe = DateUtils.startOfDay(startDate)
                 var hops = 0
@@ -111,8 +112,20 @@ object RecurrenceEngine {
                 }
                 probe
             }
+            is RecurrenceRule.MonthlyByDate -> {
+                val start = DateUtils.startOfDay(startDate)
+                val monthStart = startOfMonth(start)
+                val target = if (rule.lastDayOfMonth) lastDayOfMonthInstant(monthStart)
+                    else clampDay(monthStart, rule.dayOfMonth)
+                if (target >= start) target else {
+                    val next = startOfNextMonth(monthStart)
+                    if (rule.lastDayOfMonth) lastDayOfMonthInstant(next) else clampDay(next, rule.dayOfMonth)
+                }
+            }
+            is RecurrenceRule.Yearly -> yearlyDateOnOrAfter(DateUtils.startOfDay(startDate), rule.month, rule.dayOfMonth)
             else -> DateUtils.startOfDay(startDate)
         }
+    }
 
     private fun addInterval(rule: RecurrenceRule.Interval, from: Long): Long {
         val amount = rule.amount.coerceAtLeast(1)
@@ -120,7 +133,12 @@ object RecurrenceEngine {
         when (rule.unit) {
             RecurrenceUnit.DAY -> cal.add(Calendar.DAY_OF_MONTH, amount)
             RecurrenceUnit.WEEK -> cal.add(Calendar.WEEK_OF_YEAR, amount)
-            RecurrenceUnit.MONTH -> cal.add(Calendar.MONTH, amount)
+            RecurrenceUnit.MONTH -> {
+                cal.add(Calendar.MONTH, amount)
+                val last = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+                val anchorDay = rule.anchorDayOfMonth ?: cal.get(Calendar.DAY_OF_MONTH)
+                cal.set(Calendar.DAY_OF_MONTH, if (rule.anchorIsLastDay) last else minOf(anchorDay.coerceIn(1, 31), last))
+            }
         }
         return cal.timeInMillis
     }
@@ -132,7 +150,7 @@ object RecurrenceEngine {
      */
     private fun clampDay(monthAnchor: Long, dayOfMonth: Int): Long {
         val desired = dayOfMonth.coerceIn(1, 31)
-        val lastDay = lastDayOfMonth(monthAnchor)
+        val lastDay = lastDayOfMonthValue(monthAnchor)
         val day = minOf(desired, lastDay)
         return Calendar.getInstance().apply {
             timeInMillis = DateUtils.startOfDay(monthAnchor)
@@ -141,7 +159,7 @@ object RecurrenceEngine {
     }
 
     /** Last day of the month containing [millis], as an instant. */
-    private fun lastDayOfMonth(millis: Long): Long =
+    private fun lastDayOfMonthInstant(millis: Long): Long =
         Calendar.getInstance().apply {
             timeInMillis = DateUtils.startOfDay(millis)
             set(Calendar.DAY_OF_MONTH, lastDayOfMonthValue(millis))
@@ -151,26 +169,25 @@ object RecurrenceEngine {
         Calendar.getInstance().apply {
             timeInMillis = millis
             set(Calendar.DAY_OF_MONTH, 1)
-            getActualMaximum(Calendar.DAY_OF_MONTH)
-        }.get(Calendar.DAY_OF_MONTH)
+        }.getActualMaximum(Calendar.DAY_OF_MONTH)
 
-    private fun clampDate(from: Long, month: Int, dayOfMonth: Int): Long {
-        val desired = dayOfMonth.coerceIn(1, 31)
-        val lastDay = Calendar.getInstance().apply {
-            timeInMillis = DateUtils.startOfDay(from)
-            set(Calendar.MONTH, month.coerceIn(0, 11))
-            set(Calendar.DAY_OF_MONTH, 1)
-        }.let { c ->
-            Calendar.getInstance().apply {
-                timeInMillis = c.timeInMillis
-                set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH))
-            }.get(Calendar.DAY_OF_MONTH)
+    private fun yearlyDateOnOrAfter(from: Long, month: Int, dayOfMonth: Int): Long {
+        val targetMonth = month.coerceIn(0, 11)
+        val cal = Calendar.getInstance().apply { timeInMillis = DateUtils.startOfDay(from) }
+        val year = cal.get(Calendar.YEAR)
+        fun candidate(forYear: Int): Long {
+            val first = Calendar.getInstance().apply {
+                clear()
+                set(Calendar.YEAR, forYear)
+                set(Calendar.MONTH, targetMonth)
+                set(Calendar.DAY_OF_MONTH, 1)
+            }
+            val day = dayOfMonth.coerceIn(1, first.getActualMaximum(Calendar.DAY_OF_MONTH))
+            first.set(Calendar.DAY_OF_MONTH, day)
+            return first.timeInMillis
         }
-        return Calendar.getInstance().apply {
-            timeInMillis = DateUtils.startOfDay(from)
-            set(Calendar.MONTH, month.coerceIn(0, 11))
-            set(Calendar.DAY_OF_MONTH, minOf(desired, lastDay))
-        }.timeInMillis
+        val thisYear = candidate(year)
+        return if (thisYear >= DateUtils.startOfDay(from)) thisYear else candidate(year + 1)
     }
 
     fun startOfMonth(millis: Long): Long =
@@ -202,7 +219,12 @@ object RecurrenceEngine {
 sealed class RecurrenceRule {
 
     /** 1. Custom interval: every N days, weeks, or months. */
-    data class Interval(val unit: RecurrenceUnit, val amount: Int) : RecurrenceRule()
+    data class Interval(
+        val unit: RecurrenceUnit,
+        val amount: Int,
+        val anchorDayOfMonth: Int? = null,
+        val anchorIsLastDay: Boolean = false
+    ) : RecurrenceRule()
 
     /** 2. Specific weekdays, any combination. Saturday-start display. */
     data class Weekdays(val mask: Int) : RecurrenceRule() {

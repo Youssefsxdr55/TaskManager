@@ -10,12 +10,15 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.joe.taskmanager.data.gamification.PointsEngine
+import com.joe.taskmanager.data.backup.BackupManager
 import com.joe.taskmanager.data.settings.SettingsRepository
 import com.joe.taskmanager.notification.ReminderRescheduler
+import com.joe.taskmanager.util.DateUtils
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
+import kotlinx.coroutines.flow.first
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,28 +29,42 @@ import javax.inject.Singleton
  *
  * Every write uses a dedupeKey, which is what makes a rerun safe.
  */
+private fun dayStartForKey(key: String): Long? = runCatching {
+    java.time.LocalDate.parse(key).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+}.getOrNull()
+
 @HiltWorker
 class DayCloseWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val pointsEngine: PointsEngine,
     private val rescheduler: ReminderRescheduler,
-    private val settings: SettingsRepository
+    private val settings: SettingsRepository,
+    private val backupManager: BackupManager
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         val key = SettingsRepository.todayKey()
-        val settingsValue = settings.settings.let { flow ->
-            var s = null
-            flow.collect { s = it; return@collect }
-            s!!
+        val settingsValue = settings.settings.first()
+
+        if (settingsValue.lastDayCloseDate != key) {
+            val today = DateUtils.startOfToday()
+            var day = settingsValue.lastDayCloseDate?.let(::dayStartForKey)?.let { DateUtils.plusDays(it, 1) } ?: today
+            var processed = 0
+            while (day <= today && processed < 3660) {
+                pointsEngine.runDayClose(day)
+                day = DateUtils.plusDays(day, 1)
+                processed++
+            }
+            rescheduler.rescheduleEverything()
+            settings.setLastDayCloseDate(key)
         }
-        if (settingsValue.lastDayCloseDate == key) return Result.success()
 
-        pointsEngine.runDayClose()
-        rescheduler.rescheduleEverything()
-
-        settings.setLastDayCloseDate(key)
+        val latestSettings = settings.settings.first()
+        if (latestSettings.backupFolderUri != null && latestSettings.lastBackupDate != key) {
+            val backupResult = backupManager.exportToConfiguredFolder()
+            if (backupResult.isFailure) return Result.retry()
+        }
         return Result.success()
     }
 
