@@ -1,11 +1,18 @@
 
 package com.joe.taskmanager.ui.screens
+import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -39,6 +46,16 @@ fun SettingsScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var confirmReset by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var showAccentPicker by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    var showTextScalePicker by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val accentOptions = listOf(
+        "terracotta" to R.string.accent_terracotta,
+        "ocean" to R.string.accent_ocean,
+        "forest" to R.string.accent_forest,
+        "violet" to R.string.accent_violet,
+        "rose" to R.string.accent_rose,
+        "amber" to R.string.accent_amber
+    )
     ScreenScaffold(title = stringResource(R.string.nav_settings), onBack = onBack) { padding ->
         Column(
             modifier = Modifier
@@ -51,6 +68,22 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_theme),
                 value = stringResource(state.themeLabelRes),
                 onClick = viewModel::cycleTheme
+            )
+            SectionHeader(stringResource(R.string.settings_personalization))
+            SettingRow(
+                title = stringResource(R.string.settings_accent_color),
+                value = stringResource(state.accentLabelRes),
+                onClick = { showAccentPicker = true }
+            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) SettingRow(
+                title = stringResource(R.string.settings_dynamic_color),
+                value = stringResource(if (state.dynamicColor) R.string.settings_on else R.string.settings_off),
+                onClick = viewModel::toggleDynamicColor
+            )
+            SettingRow(
+                title = stringResource(R.string.settings_text_size),
+                value = stringResource(state.textScaleLabelRes),
+                onClick = { showTextScalePicker = true }
             )
             SettingRow(
                 title = stringResource(R.string.settings_language),
@@ -98,6 +131,59 @@ fun SettingsScreen(
         text = { Text(stringResource(R.string.points_reset_confirm)) },
         confirmButton = { TextButton(onClick = { viewModel.resetPoints(); confirmReset = false }) { Text(stringResource(R.string.points_reset)) } },
         dismissButton = { TextButton(onClick = { confirmReset = false }) { Text(stringResource(R.string.action_cancel)) } }
+    )
+    if (showAccentPicker) AlertDialog(
+        onDismissRequest = { showAccentPicker = false },
+        title = { Text(stringResource(R.string.settings_accent_color)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                accentOptions.forEach { (key, labelRes) ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            viewModel.setAccentColor(key)
+                            showAccentPicker = false
+                        }.padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(Modifier.size(24.dp).background(com.joe.taskmanager.ui.theme.AppColors.accent(key, isSystemInDarkTheme()).first, CircleShape))
+                        Text(stringResource(labelRes), modifier = Modifier.weight(1f).padding(start = 12.dp))
+                        androidx.compose.material3.RadioButton(
+                            selected = state.accentColor == key,
+                            onClick = { viewModel.setAccentColor(key); showAccentPicker = false }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { showAccentPicker = false }) { Text(stringResource(R.string.action_cancel)) } }
+    )
+    if (showTextScalePicker) AlertDialog(
+        onDismissRequest = { showTextScalePicker = false },
+        title = { Text(stringResource(R.string.settings_text_size)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                listOf(
+                    "compact" to R.string.text_scale_compact,
+                    "standard" to R.string.text_scale_standard,
+                    "large" to R.string.text_scale_large
+                ).forEach { (scale, labelRes) ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            viewModel.setTextScale(scale)
+                            showTextScalePicker = false
+                        }.padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(stringResource(labelRes), modifier = Modifier.weight(1f))
+                        androidx.compose.material3.RadioButton(
+                            selected = state.textScale == scale,
+                            onClick = { viewModel.setTextScale(scale); showTextScalePicker = false }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { showTextScalePicker = false }) { Text(stringResource(R.string.action_cancel)) } }
     )
 }
 @Composable

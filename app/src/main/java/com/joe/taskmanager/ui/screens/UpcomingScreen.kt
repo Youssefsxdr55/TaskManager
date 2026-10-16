@@ -36,6 +36,7 @@ fun UpcomingScreen(
     onOpenDrawer: () -> Unit,
     onOpenToday: () -> Unit,
     onOpenUpcoming: () -> Unit,
+    onOpenCalendar: () -> Unit,
     onTaskClick: (Long) -> Unit,
     onAddTask: () -> Unit,
     viewModel: UpcomingViewModel = hiltViewModel()
@@ -47,7 +48,7 @@ fun UpcomingScreen(
     ScreenScaffold(
         title = stringResource(R.string.nav_upcoming),
         snackbarHostState = viewModel.snackbarHostState,
-        bottomBar = { MainBottomBar(false, onOpenToday, onOpenUpcoming) },
+        bottomBar = { MainBottomBar(MainTab.UPCOMING, onOpenToday, onOpenUpcoming, onOpenCalendar) },
         topBarActions = { IconButton(onClick = onOpenDrawer) {
             Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.nav_tasks))
         } },

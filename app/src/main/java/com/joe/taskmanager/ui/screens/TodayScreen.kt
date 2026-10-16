@@ -41,6 +41,7 @@ fun TodayScreen(
     onOpenDrawer: () -> Unit,
     onOpenToday: () -> Unit,
     onOpenUpcoming: () -> Unit,
+    onOpenCalendar: () -> Unit,
     onAddTask: () -> Unit,
     onTaskClick: (Long) -> Unit,
     onSeeOverdue: () -> Unit,
@@ -56,7 +57,7 @@ fun TodayScreen(
     ScreenScaffold(
         title = stringResource(R.string.nav_today),
         snackbarHostState = viewModel.snackbarHostState,
-        bottomBar = { MainBottomBar(true, onOpenToday, onOpenUpcoming) },
+        bottomBar = { MainBottomBar(MainTab.TODAY, onOpenToday, onOpenUpcoming, onOpenCalendar) },
         topBarActions = { IconButton(onClick = onOpenDrawer) {
             Text("☰", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
         } },

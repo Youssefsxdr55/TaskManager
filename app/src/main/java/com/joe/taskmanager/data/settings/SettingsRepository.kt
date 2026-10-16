@@ -34,6 +34,9 @@ class SettingsRepository @Inject constructor(
 ) {
     private object Keys {
         val THEME = stringPreferencesKey("theme_mode")
+        val ACCENT_COLOR = stringPreferencesKey("accent_color")
+        val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
+        val TEXT_SCALE = stringPreferencesKey("text_scale")
         val LANGUAGE = stringPreferencesKey("language")           // "system" | "ar" | "en"
         val SNOOZE_MINUTES = intPreferencesKey("default_snooze_minutes")
         val FULL_SCREEN_ENABLED = booleanPreferencesKey("full_screen_alarm_enabled")
@@ -49,6 +52,9 @@ class SettingsRepository @Inject constructor(
 
     data class Settings(
         val themeMode: ThemeMode = ThemeMode.SYSTEM,
+        val accentColor: String = "terracotta",
+        val dynamicColor: Boolean = false,
+        val textScale: String = "standard",
         val language: String = "system",
         val defaultSnoozeMinutes: Int = 10,
         val fullScreenAlarmEnabled: Boolean = true,
@@ -65,6 +71,9 @@ class SettingsRepository @Inject constructor(
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
         Settings(
             themeMode = p[Keys.THEME]?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() } ?: ThemeMode.SYSTEM,
+            accentColor = p[Keys.ACCENT_COLOR] ?: "terracotta",
+            dynamicColor = p[Keys.DYNAMIC_COLOR] ?: false,
+            textScale = p[Keys.TEXT_SCALE]?.takeIf { it in setOf("compact", "standard", "large") } ?: "standard",
             language = p[Keys.LANGUAGE] ?: "system",
             defaultSnoozeMinutes = p[Keys.SNOOZE_MINUTES] ?: 10,
             fullScreenAlarmEnabled = p[Keys.FULL_SCREEN_ENABLED] ?: true,
@@ -80,6 +89,16 @@ class SettingsRepository @Inject constructor(
     }
 
     suspend fun setTheme(mode: ThemeMode) = context.dataStore.edit { it[Keys.THEME] = mode.name }
+
+    suspend fun setAccentColor(color: String) = context.dataStore.edit {
+        it[Keys.ACCENT_COLOR] = color.takeIf { value -> value in setOf("terracotta", "ocean", "forest", "violet", "rose", "amber") } ?: "terracotta"
+    }
+
+    suspend fun setDynamicColor(enabled: Boolean) = context.dataStore.edit { it[Keys.DYNAMIC_COLOR] = enabled }
+
+    suspend fun setTextScale(scale: String) = context.dataStore.edit {
+        it[Keys.TEXT_SCALE] = scale.takeIf { value -> value in setOf("compact", "standard", "large") } ?: "standard"
+    }
 
     suspend fun setLanguage(tag: String) {
         context.dataStore.edit { it[Keys.LANGUAGE] = tag }
@@ -118,6 +137,9 @@ class SettingsRepository @Inject constructor(
         val value = settings.first()
         return buildMap {
             put("themeMode", value.themeMode.name)
+            put("accentColor", value.accentColor)
+            put("dynamicColor", value.dynamicColor.toString())
+            put("textScale", value.textScale)
             put("language", value.language)
             put("defaultSnoozeMinutes", value.defaultSnoozeMinutes.toString())
             put("fullScreenAlarmEnabled", value.fullScreenAlarmEnabled.toString())
@@ -134,6 +156,9 @@ class SettingsRepository @Inject constructor(
 
     suspend fun restoreExportableSettings(values: Map<String, String>) = context.dataStore.edit { p ->
         p.remove(Keys.THEME)
+        p.remove(Keys.ACCENT_COLOR)
+        p.remove(Keys.DYNAMIC_COLOR)
+        p.remove(Keys.TEXT_SCALE)
         p.remove(Keys.LANGUAGE)
         p.remove(Keys.SNOOZE_MINUTES)
         p.remove(Keys.FULL_SCREEN_ENABLED)
@@ -146,6 +171,9 @@ class SettingsRepository @Inject constructor(
         p.remove(Keys.LAST_BACKUP_DATE)
         p.remove(Keys.LAST_DAY_CLOSE_DATE)
         values["themeMode"]?.let { raw -> runCatching { ThemeMode.valueOf(raw) }.getOrNull()?.let { p[Keys.THEME] = it.name } }
+        values["accentColor"]?.takeIf { it in setOf("terracotta", "ocean", "forest", "violet", "rose", "amber") }?.let { p[Keys.ACCENT_COLOR] = it }
+        values["dynamicColor"]?.toBooleanStrictOrNull()?.let { p[Keys.DYNAMIC_COLOR] = it }
+        values["textScale"]?.takeIf { it in setOf("compact", "standard", "large") }?.let { p[Keys.TEXT_SCALE] = it }
         values["language"]?.let { p[Keys.LANGUAGE] = it }
         values["defaultSnoozeMinutes"]?.toIntOrNull()?.coerceIn(1, 120)?.let { p[Keys.SNOOZE_MINUTES] = it }
         values["fullScreenAlarmEnabled"]?.toBooleanStrictOrNull()?.let { p[Keys.FULL_SCREEN_ENABLED] = it }

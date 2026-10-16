@@ -36,7 +36,12 @@ class MainActivity : ComponentActivity() {
             ready.value = settings != null
 
             val value = settings
-            TaskManagerTheme(themeMode = value?.themeMode ?: com.joe.taskmanager.data.settings.ThemeMode.SYSTEM) {
+            TaskManagerTheme(
+                themeMode = value?.themeMode ?: com.joe.taskmanager.data.settings.ThemeMode.SYSTEM,
+                accentColor = value?.accentColor ?: "terracotta",
+                dynamicColor = value?.dynamicColor ?: false,
+                textScale = value?.textScale ?: "standard"
+            ) {
                 if (value != null) {
                     TaskManagerNavHost(showOnboarding = !value.onboardingComplete)
                 }

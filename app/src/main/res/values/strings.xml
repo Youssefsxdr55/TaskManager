@@ -231,4 +231,19 @@
     <string name="recurrence_desc_month_day">Monthly on day %1$d</string>
     <string name="recurrence_desc_yearly">Yearly on %1$d/%2$d</string>
     <string name="recurrence_desc_default">Recurring</string>
+    <string name="settings_personalization">Personalization</string>
+    <string name="settings_accent_color">Accent color</string>
+    <string name="settings_dynamic_color">Use wallpaper colors</string>
+    <string name="settings_text_size">App text size</string>
+    <string name="settings_on">On</string>
+    <string name="settings_off">Off</string>
+    <string name="accent_terracotta">Terracotta</string>
+    <string name="accent_ocean">Ocean</string>
+    <string name="accent_forest">Forest</string>
+    <string name="accent_violet">Violet</string>
+    <string name="accent_rose">Rose</string>
+    <string name="accent_amber">Amber</string>
+    <string name="text_scale_compact">Compact</string>
+    <string name="text_scale_standard">Standard</string>
+    <string name="text_scale_large">Large</string>
 </resources>

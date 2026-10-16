@@ -119,6 +119,7 @@ fun TaskManagerNavHost(showOnboarding: Boolean = false, modifier: Modifier = Mod
                         restoreState = true
                     }
                 },
+                onOpenCalendar = { openDrawerRoute(Route.Calendar) },
                 onAddTask = { navController.navigate(Route.AddTask.create()) },
                 onTaskClick = { navController.navigate(Route.TaskDetail.create(it)) },
                 onSeeOverdue = { navController.navigate(Route.AllTasks.path) },
@@ -144,6 +145,7 @@ fun TaskManagerNavHost(showOnboarding: Boolean = false, modifier: Modifier = Mod
                         restoreState = true
                     }
                 },
+                onOpenCalendar = { openDrawerRoute(Route.Calendar) },
                 onTaskClick = { navController.navigate(Route.TaskDetail.create(it)) },
                 onAddTask = { navController.navigate(Route.AddTask.create()) }
             )
@@ -173,7 +175,9 @@ fun TaskManagerNavHost(showOnboarding: Boolean = false, modifier: Modifier = Mod
         composable(Route.Recurrence.path) { RecurrenceScreen() }
         composable(Route.Calendar.path) {
             CalendarScreen(onTaskClick = { navController.navigate(Route.TaskDetail.create(it)) },
-                onAddTask = { navController.navigate(Route.AddTask.create(dueDate = it)) })
+                onAddTask = { navController.navigate(Route.AddTask.create(dueDate = it)) },
+                onOpenToday = { navController.navigate(Route.Today.path) { launchSingleTop = true } },
+                onOpenUpcoming = { navController.navigate(Route.Upcoming.path) { launchSingleTop = true } })
         }
         composable(Route.Insights.path) {
             InsightsScreen(onBack = { navController.popBackStack() },

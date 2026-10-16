@@ -2,9 +2,14 @@
 package com.joe.taskmanager.ui.theme
 
 import android.app.Activity
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -15,6 +20,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.joe.taskmanager.data.local.entity.Priority
@@ -108,6 +115,9 @@ private val AppTypography = Typography(
 @Composable
 fun TaskManagerTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
+    accentColor: String = "terracotta",
+    dynamicColor: Boolean = false,
+    textScale: String = "standard",
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (themeMode) {
@@ -115,7 +125,28 @@ fun TaskManagerTheme(
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
     }
-    val scheme = if (darkTheme) DarkScheme else LightScheme
+    val context = LocalContext.current
+    val (accent, onAccent) = AppColors.accent(accentColor, darkTheme)
+    val scheme: ColorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        darkTheme -> DarkScheme.copy(primary = accent, onPrimary = onAccent, secondary = accent, onSecondary = onAccent)
+        else -> LightScheme.copy(primary = accent, onPrimary = onAccent, secondary = accent, onSecondary = onAccent)
+    }
+    val scale = when (textScale) { "compact" -> 0.92f; "large" -> 1.12f; else -> 1f }
+    fun scaled(style: TextStyle) = style.copy(
+        fontSize = (style.fontSize.value * scale).sp,
+        lineHeight = (style.lineHeight.value * scale).sp
+    )
+    val typography = AppTypography.copy(
+        headlineMedium = scaled(AppTypography.headlineMedium),
+        titleLarge = scaled(AppTypography.titleLarge),
+        titleMedium = scaled(AppTypography.titleMedium),
+        bodyLarge = scaled(AppTypography.bodyLarge),
+        bodyMedium = scaled(AppTypography.bodyMedium),
+        labelLarge = scaled(AppTypography.labelLarge),
+        labelMedium = scaled(AppTypography.labelMedium)
+    )
     val view = LocalView.current
 
     if (!view.isInEditMode) {
@@ -129,7 +160,14 @@ fun TaskManagerTheme(
 
     MaterialTheme(
         colorScheme = scheme,
-        typography = AppTypography,
+        typography = typography,
+        shapes = Shapes(
+            extraSmall = RoundedCornerShape(8.dp),
+            small = RoundedCornerShape(12.dp),
+            medium = RoundedCornerShape(18.dp),
+            large = RoundedCornerShape(24.dp),
+            extraLarge = RoundedCornerShape(32.dp)
+        ),
         content = content
     )
 }

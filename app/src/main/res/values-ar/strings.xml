@@ -230,4 +230,19 @@
     <string name="recurrence_desc_month_day">شهريًا في اليوم %1$d</string>
     <string name="recurrence_desc_yearly">سنويًا في %1$d/%2$d</string>
     <string name="recurrence_desc_default">مهمة متكررة</string>
+    <string name="settings_personalization">التخصيص</string>
+    <string name="settings_accent_color">اللون الأساسي</string>
+    <string name="settings_dynamic_color">استخدام ألوان الخلفية</string>
+    <string name="settings_text_size">حجم نص التطبيق</string>
+    <string name="settings_on">مفعّل</string>
+    <string name="settings_off">متوقف</string>
+    <string name="accent_terracotta">طوبي</string>
+    <string name="accent_ocean">محيطي</string>
+    <string name="accent_forest">غابي</string>
+    <string name="accent_violet">بنفسجي</string>
+    <string name="accent_rose">وردي</string>
+    <string name="accent_amber">كهرماني</string>
+    <string name="text_scale_compact">مضغوط</string>
+    <string name="text_scale_standard">عادي</string>
+    <string name="text_scale_large">كبير</string>
 </resources>
