@@ -63,11 +63,7 @@ class GenericTaskListViewModel @Inject constructor(
         if (mode in setOf("DUE", "PRIORITY", "CREATED", "MANUAL")) sortMode.value = mode
     }
 
-    /**
-     * Completing shows an Undo snackbar (PRD 7.1). Deleting is available from the
-     * detail screen; the swipe-to-complete path is the one that must be undoable
-     * here since it is one gesture away from being accidental.
-     */
+    /** Completing shows an Undo snackbar (PRD 7.1). */
     fun toggleComplete(taskId: Long) {
         viewModelScope.launch {
             repository.setCompleted(taskId, completed = true)
@@ -80,6 +76,9 @@ class GenericTaskListViewModel @Inject constructor(
                 repository.setCompleted(taskId, completed = false)
             }
         }
+    }
+    fun moveToTrash(taskId: Long) {
+        viewModelScope.launch { repository.moveToTrash(taskId) }
     }
     fun snooze(taskId: Long, choice: SnoozeChoice) {
         viewModelScope.launch {

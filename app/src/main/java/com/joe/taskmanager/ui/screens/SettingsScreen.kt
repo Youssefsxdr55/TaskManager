@@ -4,6 +4,8 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +21,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -136,21 +141,36 @@ fun SettingsScreen(
         onDismissRequest = { showAccentPicker = false },
         title = { Text(stringResource(R.string.settings_accent_color)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                accentOptions.forEach { (key, labelRes) ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth().clickable {
-                            viewModel.setAccentColor(key)
-                            showAccentPicker = false
-                        }.padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(Modifier.size(24.dp).background(com.joe.taskmanager.ui.theme.AppColors.accent(key, isSystemInDarkTheme()).first, CircleShape))
-                        Text(stringResource(labelRes), modifier = Modifier.weight(1f).padding(start = 12.dp))
-                        androidx.compose.material3.RadioButton(
-                            selected = state.accentColor == key,
-                            onClick = { viewModel.setAccentColor(key); showAccentPicker = false }
-                        )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                accentOptions.chunked(3).forEach { optionsRow ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        optionsRow.forEach { (key, labelRes) ->
+                            val selected = state.accentColor == key
+                            Surface(
+                                modifier = Modifier.weight(1f).clickable {
+                                    viewModel.setAccentColor(key)
+                                    showAccentPicker = false
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                color = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+                                border = BorderStroke(
+                                    if (selected) 2.dp else 1.dp,
+                                    if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+                                )
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 6.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Box(Modifier.size(30.dp).background(com.joe.taskmanager.ui.theme.AppColors.accent(key, isSystemInDarkTheme()).first, CircleShape))
+                                    Text(stringResource(labelRes), style = MaterialTheme.typography.labelSmall, maxLines = 1)
+                                    if (selected) Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+                                    else Spacer(Modifier.size(16.dp))
+                                }
+                            }
+                        }
+                        if (optionsRow.size < 3) Spacer(Modifier.weight((3 - optionsRow.size).toFloat()))
                     }
                 }
             }

@@ -4,8 +4,7 @@ package com.joe.taskmanager.ui.theme
 import androidx.compose.ui.unit.dp
 
 /**
- * TickTick-like density (PRD 8). A compact 4dp grid rather than Material's
- * 8dp baseline keeps more rows visible per screen.
+ * Shared spacing tokens on a 4dp base grid.
  */
 object AppSpacing {
     val xs = 4.dp
@@ -14,4 +13,6 @@ object AppSpacing {
     val lg = 16.dp
     val xl = 24.dp
     val xxl = 32.dp
+    val screenPadding = 16.dp
+    val cardGap = 8.dp
 }

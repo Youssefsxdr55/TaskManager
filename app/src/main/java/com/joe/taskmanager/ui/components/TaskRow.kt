@@ -3,8 +3,6 @@ package com.joe.taskmanager.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,19 +13,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,12 +45,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.joe.taskmanager.R
 import com.joe.taskmanager.ui.components.SnoozeChoice
 import com.joe.taskmanager.data.local.entity.Priority
 import com.joe.taskmanager.data.local.entity.Task
 import com.joe.taskmanager.data.local.entity.TaskStatus
 import com.joe.taskmanager.ui.theme.priorityColor
+import com.joe.taskmanager.ui.util.DateText
 
 /**
  * One task row.
@@ -55,17 +64,48 @@ import com.joe.taskmanager.ui.theme.priorityColor
  * by bolding the title, so the title remains readable at small font scales.
  */
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun TaskRow(
     task: Task,
     onToggleComplete: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     showListName: String? = null,
-    onSnooze: (SnoozeChoice) -> Unit = {}
+    onSnooze: (SnoozeChoice) -> Unit = {},
+    onDelete: () -> Unit = {}
 ) {
     var showSnooze by remember(task.id) { mutableStateOf(false) }
-    var horizontalDrag by remember(task.id) { mutableFloatStateOf(0f) }
+    var showDeleteConfirmation by remember(task.id) { mutableStateOf(false) }
+    var showCelebration by remember(task.id) { mutableStateOf(false) }
     val completed = task.status == TaskStatus.COMPLETED
+    val celebration by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.task_complete))
+    LaunchedEffect(showCelebration) {
+        if (showCelebration) {
+            kotlinx.coroutines.delay(1_100)
+            showCelebration = false
+        }
+        if (!completed) {
+            IconButton(onClick = { showSnooze = true }, modifier = Modifier.size(32.dp)) {
+                Icon(
+                    imageVector = Icons.Outlined.Schedule,
+                    contentDescription = stringResource(R.string.action_snooze),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+    val complete = {
+        if (!completed) showCelebration = true
+        onToggleComplete()
+    }
+    val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = { target ->
+        when (target) {
+            SwipeToDismissBoxValue.StartToEnd -> { if (!completed) complete(); false }
+            SwipeToDismissBoxValue.EndToStart -> { showDeleteConfirmation = true; false }
+            SwipeToDismissBoxValue.Settled -> true
+        }
+    })
     // PRD 8: overdue red is only for genuinely overdue, still-open tasks.
     val titleColor = when {
         completed -> MaterialTheme.colorScheme.onSurfaceVariant
@@ -73,31 +113,41 @@ fun TaskRow(
         else -> MaterialTheme.colorScheme.onBackground
     }
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .pointerInput(task.id, completed) {
-                val swipeThreshold = 72.dp.toPx()
-                val consumeThreshold = 24.dp.toPx()
-                detectHorizontalDragGestures(
-                    onHorizontalDrag = { change, amount ->
-                        horizontalDrag += amount
-                        if (kotlin.math.abs(horizontalDrag) > consumeThreshold) change.consume()
-                    },
-                    onDragEnd = {
-                        when {
-                            horizontalDrag > swipeThreshold && !completed -> onToggleComplete()
-                            horizontalDrag < -swipeThreshold && !completed -> showSnooze = true
-                        }
-                        horizontalDrag = 0f
-                    },
-                    onDragCancel = { horizontalDrag = 0f }
+    SwipeToDismissBox(
+        state = dismissState,
+        modifier = modifier.fillMaxWidth(),
+        enableDismissFromStartToEnd = !completed,
+        enableDismissFromEndToStart = true,
+        backgroundContent = {
+            val color = when (dismissState.dismissDirection) {
+                androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
+                androidx.compose.material3.SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+                androidx.compose.material3.SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surface
+            }
+            val alignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart)
+                Alignment.CenterEnd else Alignment.CenterStart
+            Box(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(color).padding(16.dp),
+                contentAlignment = alignment
+            ) {
+                Text(
+                    text = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd)
+                        stringResource(R.string.cd_mark_done) else stringResource(R.string.action_delete),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.Top
+        }
     ) {
+      ElevatedCard(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+      ) {
+       Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.Top
+       ) {
         // Priority bar
         Box(
             modifier = Modifier
@@ -113,13 +163,12 @@ fun TaskRow(
         )
 
         IconButton(
-            onClick = onToggleComplete,
+            onClick = complete,
             modifier = Modifier.size(28.dp)
         ) {
             Icon(
                 imageVector = when {
                     completed -> Icons.Filled.CheckCircle
-                    task.priority == Priority.HIGH -> Icons.Filled.Circle
                     else -> Icons.Outlined.Circle
                 },
                 contentDescription = stringResource(
@@ -155,18 +204,65 @@ fun TaskRow(
                 )
             }
 
-            val meta = buildMetaLine(task, completed)
-            if (meta.isNotEmpty()) {
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = meta,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = if (task.isOverdue && !completed)
-                        MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            if (task.priority != Priority.NONE || task.hasTime) {
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    when (task.priority) {
+                        Priority.HIGH -> R.string.priority_high
+                        Priority.MEDIUM -> R.string.priority_medium
+                        Priority.LOW -> R.string.priority_low
+                        Priority.NONE -> null
+                    }?.let { label ->
+                        Text(
+                            text = stringResource(label),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = priorityColor(task.priority),
+                            modifier = Modifier.clip(RoundedCornerShape(50)).background(
+                                priorityColor(task.priority).copy(alpha = 0.14f)
+                            ).padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                    val dueDate = task.dueDate
+                    val timeLabel = if (task.hasTime && dueDate != null) DateText.format(dueDate) else null
+                    if (!timeLabel.isNullOrEmpty()) {
+                        Text(
+                            text = timeLabel,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (task.isOverdue && !completed) MaterialTheme.colorScheme.error
+                            else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         }
+        if (showCelebration) {
+            LottieAnimation(
+                composition = celebration,
+                iterations = 1,
+                modifier = Modifier.size(48.dp)
+            )
+        }
+       }
+      }
+    }
+
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text(stringResource(R.string.task_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.task_delete_confirm_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteConfirmation = false
+                    onDelete()
+                }) { Text(stringResource(R.string.action_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
     }
 
     if (showSnooze) {
@@ -178,26 +274,4 @@ fun TaskRow(
             }
         )
     }
-}
-
-/**
- * Builds the "meta" line under the title. Kept as a plain function so the same
- * formatting rules are shared by the row and the task detail screen.
- */
-@Composable
-private fun buildMetaLine(task: Task, completed: Boolean): String {
-    val parts = mutableListOf<String>()
-
-    when (task.priority) {
-        Priority.HIGH -> parts += stringResource(R.string.priority_high)
-        Priority.MEDIUM -> parts += stringResource(R.string.priority_medium)
-        Priority.LOW -> parts += stringResource(R.string.priority_low)
-        Priority.NONE -> Unit
-    }
-
-    if (task.hasTime) {
-        parts += com.joe.taskmanager.ui.util.DateText.format(task.dueDate ?: return "")
-    }
-
-    return parts.joinToString("  ·  ")
 }

@@ -12,7 +12,7 @@ object AppColors {
     val LightBackground = Color(0xFFF4F3F2)
     val LightSurface = Color(0xFFFFFFFF)
     val LightSurfaceVariant = Color(0xFFE7E5E3)
-    val LightAccent = Color(0xFF8B5E3C)
+    val LightAccent = Color(0xFF2563EB)
     val LightOnAccent = Color(0xFFFFFFFF)
     val LightOnBackground = Color(0xFF201F1E)
     val LightOnSurfaceVariant = Color(0xFF5F5B57)
@@ -23,7 +23,7 @@ object AppColors {
     val DarkBackground = Color(0xFF161515)
     val DarkSurface = Color(0xFF201F1E)
     val DarkSurfaceVariant = Color(0xFF2B2927)
-    val DarkAccent = Color(0xFFC89B77)
+    val DarkAccent = Color(0xFF93B4FF)
     val DarkOnAccent = Color(0xFF1A1209)
     val DarkOnBackground = Color(0xFFEDE8E3)
     val DarkOnSurfaceVariant = Color(0xFFB5ACA5)
@@ -38,7 +38,8 @@ object AppColors {
             "violet" -> listOf(Color(0xFF6552A1), Color(0xFFFFFFFF), Color(0xFFC4B5F3), Color(0xFF211A3C))
             "rose" -> listOf(Color(0xFF9C4661), Color(0xFFFFFFFF), Color(0xFFF0AFC1), Color(0xFF32131E))
             "amber" -> listOf(Color(0xFF855500), Color(0xFFFFFFFF), Color(0xFFFFC968), Color(0xFF2C1A00))
-            else -> listOf(Color(0xFF9A493A), Color(0xFFFFFFFF), Color(0xFFFFB5A4), Color(0xFF35120B))
+            // The existing terracotta preference key now selects the refreshed blue brand color.
+            else -> listOf(LightAccent, Color(0xFFFFFFFF), DarkAccent, Color(0xFF10254A))
         }
         return if (dark) darkAccent to darkOn else light to lightOn
     }
@@ -53,7 +54,7 @@ object AppColors {
 
     // Default list palette offered when creating a list (PRD 6.2: each list has a color).
     val ListPaletteLight = listOf(
-        Color(0xFF8B5E3C), Color(0xFF3F7D58), Color(0xFF2F6F8F),
+        Color(0xFF2563EB), Color(0xFF3F7D58), Color(0xFF2F6F8F),
         Color(0xFF8C4A6B), Color(0xFF6B5B95), Color(0xFF9A6B2F)
     )
     val ListPaletteDark = listOf(

@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.animateItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,7 +62,7 @@ fun TodayScreen(
         snackbarHostState = viewModel.snackbarHostState,
         bottomBar = { MainBottomBar(MainTab.TODAY, onOpenToday, onOpenUpcoming, onOpenCalendar) },
         topBarActions = { IconButton(onClick = onOpenDrawer) {
-            Text("☰", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+            Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.nav_tasks))
         } },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddTask) {
@@ -72,8 +75,8 @@ fun TodayScreen(
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().then(padding),
-            contentPadding = PaddingValues(bottom = 88.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 88.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
                 Row(
@@ -87,7 +90,7 @@ fun TodayScreen(
                         )
                     }
                     IconButton(onClick = onOpenSettings) {
-                        Text("⚙", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
                     }
                 }
             }
@@ -99,7 +102,7 @@ fun TodayScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .padding(vertical = 4.dp)
                             .clickable(onClick = onSeeOverdue),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer
@@ -127,6 +130,7 @@ fun TodayScreen(
             items(state.todayTasks, key = { it.id }) { task ->
                 TaskRow(
                     task = task,
+                    modifier = Modifier.animateItem(),
                     showListName = state.listNames[task.listId],
                     onToggleComplete = {
                         val completing = task.status == TaskStatus.OPEN
@@ -141,7 +145,8 @@ fun TodayScreen(
                         }
                     },
                     onClick = { onTaskClick(task.id) },
-                    onSnooze = { viewModel.snooze(task.id, it) }
+                    onSnooze = { viewModel.snooze(task.id, it) },
+                    onDelete = { viewModel.moveToTrash(task.id) }
                 )
             }
         }

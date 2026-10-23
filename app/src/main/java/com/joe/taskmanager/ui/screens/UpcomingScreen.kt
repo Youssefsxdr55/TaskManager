@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.animateItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -68,8 +69,8 @@ fun UpcomingScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize().then(padding),
-            contentPadding = PaddingValues(bottom = 88.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 88.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // PRD 7.1: Upcoming is grouped by date.
             state.groups.forEach { group ->
@@ -77,7 +78,7 @@ fun UpcomingScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 6.dp)
+                            .padding(top = 20.dp, bottom = 6.dp)
                     ) {
                         Text(
                             text = DateText.dateOnly(group.dateStart),
@@ -94,13 +95,15 @@ fun UpcomingScreen(
                 items(group.tasks, key = { it.id }) { task ->
                     TaskRow(
                         task = task,
+                        modifier = Modifier.animateItem(),
                         onToggleComplete = {
                             val completing = task.status == com.joe.taskmanager.data.local.entity.TaskStatus.OPEN
                             viewModel.toggleComplete(task.id, task.status)
                             if (completing) viewModel.showUndoSnackbar(task.id, completedMessage, undoLabel)
                         },
                         onClick = { onTaskClick(task.id) },
-                        onSnooze = { viewModel.snooze(task.id, it) }
+                        onSnooze = { viewModel.snooze(task.id, it) },
+                        onDelete = { viewModel.moveToTrash(task.id) }
                     )
                 }
             }

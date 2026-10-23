@@ -20,10 +20,13 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.GoogleFont
+import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
+import com.joe.taskmanager.R
 import com.joe.taskmanager.data.local.entity.Priority
 import com.joe.taskmanager.data.settings.ThemeMode
 
@@ -66,50 +69,87 @@ private val DarkScheme = darkColorScheme(
     outlineVariant = AppColors.DarkOutline
 )
 
-/** TickTick-like layout density (PRD 8: clean, simple, minimal). */
+private val GoogleFontsProvider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = R.array.com_google_android_gms_fonts_certs
+)
+
+/** Cairo is downloaded through AndroidX Google Fonts and falls back cleanly if offline. */
+private val Cairo = FontFamily(
+    Font(
+        googleFont = GoogleFont("Cairo"),
+        fontProvider = GoogleFontsProvider,
+        weight = FontWeight.Normal
+    ),
+    Font(
+        googleFont = GoogleFont("Cairo"),
+        fontProvider = GoogleFontsProvider,
+        weight = FontWeight.Medium
+    ),
+    Font(
+        googleFont = GoogleFont("Cairo"),
+        fontProvider = GoogleFontsProvider,
+        weight = FontWeight.SemiBold
+    ),
+    Font(
+        googleFont = GoogleFont("Cairo"),
+        fontProvider = GoogleFontsProvider,
+        weight = FontWeight.Bold
+    )
+)
+
 private val AppTypography = Typography(
+    displayLarge = TextStyle(fontFamily = Cairo, fontWeight = FontWeight.Bold, fontSize = 57.sp, lineHeight = 64.sp),
+    displayMedium = TextStyle(fontFamily = Cairo, fontWeight = FontWeight.Bold, fontSize = 45.sp, lineHeight = 52.sp),
+    displaySmall = TextStyle(fontFamily = Cairo, fontWeight = FontWeight.SemiBold, fontSize = 36.sp, lineHeight = 44.sp),
+    headlineLarge = TextStyle(fontFamily = Cairo, fontWeight = FontWeight.SemiBold, fontSize = 32.sp, lineHeight = 40.sp),
     headlineMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Cairo,
         fontWeight = FontWeight.SemiBold,
         fontSize = 24.sp,
         lineHeight = 30.sp
     ),
+    headlineSmall = TextStyle(fontFamily = Cairo, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, lineHeight = 32.sp),
     titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Cairo,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
         lineHeight = 26.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Cairo,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 22.sp
     ),
+    titleSmall = TextStyle(fontFamily = Cairo, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Cairo,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 22.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Cairo,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp
     ),
+    bodySmall = TextStyle(fontFamily = Cairo, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 16.sp),
     labelLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Cairo,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 18.sp
     ),
     labelMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Cairo,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp
-    )
+    ),
+    labelSmall = TextStyle(fontFamily = Cairo, fontWeight = FontWeight.Medium, fontSize = 11.sp, lineHeight = 16.sp)
 )
 
 @Composable
@@ -139,13 +179,21 @@ fun TaskManagerTheme(
         lineHeight = (style.lineHeight.value * scale).sp
     )
     val typography = AppTypography.copy(
+        displayLarge = scaled(AppTypography.displayLarge),
+        displayMedium = scaled(AppTypography.displayMedium),
+        displaySmall = scaled(AppTypography.displaySmall),
+        headlineLarge = scaled(AppTypography.headlineLarge),
         headlineMedium = scaled(AppTypography.headlineMedium),
+        headlineSmall = scaled(AppTypography.headlineSmall),
         titleLarge = scaled(AppTypography.titleLarge),
         titleMedium = scaled(AppTypography.titleMedium),
+        titleSmall = scaled(AppTypography.titleSmall),
         bodyLarge = scaled(AppTypography.bodyLarge),
         bodyMedium = scaled(AppTypography.bodyMedium),
+        bodySmall = scaled(AppTypography.bodySmall),
         labelLarge = scaled(AppTypography.labelLarge),
-        labelMedium = scaled(AppTypography.labelMedium)
+        labelMedium = scaled(AppTypography.labelMedium),
+        labelSmall = scaled(AppTypography.labelSmall)
     )
     val view = LocalView.current
 
@@ -162,11 +210,11 @@ fun TaskManagerTheme(
         colorScheme = scheme,
         typography = typography,
         shapes = Shapes(
-            extraSmall = RoundedCornerShape(8.dp),
+            extraSmall = RoundedCornerShape(4.dp),
             small = RoundedCornerShape(12.dp),
-            medium = RoundedCornerShape(18.dp),
-            large = RoundedCornerShape(24.dp),
-            extraLarge = RoundedCornerShape(32.dp)
+            medium = RoundedCornerShape(16.dp),
+            large = RoundedCornerShape(20.dp),
+            extraLarge = RoundedCornerShape(28.dp)
         ),
         content = content
     )

@@ -18,6 +18,8 @@
     <string name="action_save">Save</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_delete">Delete</string>
+    <string name="task_delete_confirm_title">Move task to Trash?</string>
+    <string name="task_delete_confirm_body">You can restore it later from Trash.</string>
     <string name="action_undo">Undo</string>
     <string name="action_add_task">Add task</string>
     <string name="action_snooze">Snooze</string>
@@ -237,7 +239,7 @@
     <string name="settings_text_size">App text size</string>
     <string name="settings_on">On</string>
     <string name="settings_off">Off</string>
-    <string name="accent_terracotta">Terracotta</string>
+    <string name="accent_terracotta">Blue</string>
     <string name="accent_ocean">Ocean</string>
     <string name="accent_forest">Forest</string>
     <string name="accent_violet">Violet</string>

@@ -18,6 +18,8 @@
     <string name="action_save">حفظ</string>
     <string name="action_cancel">إلغاء</string>
     <string name="action_delete">حذف</string>
+    <string name="task_delete_confirm_title">نقل المهمة إلى سلة المهملات؟</string>
+    <string name="task_delete_confirm_body">يمكنك استعادتها لاحقًا من سلة المهملات.</string>
     <string name="action_undo">تراجع</string>
     <string name="action_add_task">إضافة مهمة</string>
     <string name="action_snooze">تأجيل</string>
@@ -236,7 +238,7 @@
     <string name="settings_text_size">حجم نص التطبيق</string>
     <string name="settings_on">مفعّل</string>
     <string name="settings_off">متوقف</string>
-    <string name="accent_terracotta">طوبي</string>
+    <string name="accent_terracotta">أزرق</string>
     <string name="accent_ocean">محيطي</string>
     <string name="accent_forest">غابي</string>
     <string name="accent_violet">بنفسجي</string>

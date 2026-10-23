@@ -103,4 +103,8 @@ class TodayViewModel @Inject constructor(
         }
     }
 
+    fun moveToTrash(taskId: Long) {
+        viewModelScope.launch { repository.moveToTrash(taskId) }
+    }
+
 }

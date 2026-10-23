@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.animateItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -88,16 +89,17 @@ fun TaskListScreen(
         }
         LazyColumn(
             modifier = Modifier.fillMaxSize().weight(1f),
-            contentPadding = PaddingValues(bottom = 88.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 88.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(state.tasks, key = { it.id }) { task ->
                 TaskRow(
                     task = task,
+                    modifier = Modifier.animateItem(),
                     onToggleComplete = { viewModel.toggleComplete(task.id) },
                     onClick = { onTaskClick(task.id) },
-                    modifier = if (tagId != null) Modifier else Modifier,
-                    onSnooze = { viewModel.snooze(task.id, it) }
+                    onSnooze = { viewModel.snooze(task.id, it) },
+                    onDelete = { viewModel.moveToTrash(task.id) }
                 )
             }
         }
