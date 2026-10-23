@@ -84,16 +84,6 @@ fun TaskRow(
             kotlinx.coroutines.delay(1_100)
             showCelebration = false
         }
-        if (!completed) {
-            IconButton(onClick = { showSnooze = true }, modifier = Modifier.size(32.dp)) {
-                Icon(
-                    imageVector = Icons.Outlined.Schedule,
-                    contentDescription = stringResource(R.string.action_snooze),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
     }
     val complete = {
         if (!completed) showCelebration = true
@@ -241,6 +231,16 @@ fun TaskRow(
                 iterations = 1,
                 modifier = Modifier.size(48.dp)
             )
+        }
+        if (!completed) {
+            IconButton(onClick = { showSnooze = true }, modifier = Modifier.size(32.dp)) {
+                Icon(
+                    imageVector = Icons.Outlined.Schedule,
+                    contentDescription = stringResource(R.string.action_snooze),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
        }
       }
